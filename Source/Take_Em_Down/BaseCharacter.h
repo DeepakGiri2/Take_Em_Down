@@ -36,7 +36,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Legs;
 	/** LodSyncComp **/
-	ULODSyncComponent* MetaLod;
+	class ULODSyncComponent* MetaLod;
 
 protected:
 	// Called when the game starts or when spawned
