@@ -2,6 +2,8 @@
 
 
 #include "PlayerCharacter.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 // Sets default values
@@ -11,9 +13,15 @@ MouseHipTurnRate(1.0f), MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f), MouseA
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCam"));
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	Camera->SetupAttachment(CameraBoom);
+	Camera->SetActive(true);
+	CameraBoom->TargetArmLength = 250;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.0f), FRotator(0.f, -90.0f, 0.f));
 	GetCharacterMovement()->JumpZVelocity = 690.f;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
 	GetCharacterMovement()->AirControl = 0.3f;

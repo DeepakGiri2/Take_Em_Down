@@ -36,6 +36,11 @@ ABaseCharacter::ABaseCharacter()
 	Mustache->SetupAttachment(Face);
 	Beard->SetupAttachment(Face);
 
+	Face->SetMasterPoseComponent(GetMesh());
+	Torso->SetMasterPoseComponent(GetMesh());
+	Feet->SetMasterPoseComponent(GetMesh());
+	Legs->SetMasterPoseComponent(GetMesh());
+
 	/** LodComponent **/
 	MetaLod = CreateDefaultSubobject<ULODSyncComponent>(TEXT("LodManager"));
 	MetaLod->ForcedLOD = 3;
