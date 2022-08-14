@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-MultiplayerModule-0009.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Users\Deepak\Documents\Unreal Projects\Take_Em_Down\Take_Em_Down\Intermediate\Build\Win64\Take_Em_DownEditor\Development\Engine\SharedPCH.Engine.ShadowErrors.h.obj"
+"C:\Users\Deepak\Documents\Unreal Projects\Take_Em_Down\Take_Em_Down\Plugins\MultiplayerModule\Intermediate\Build\Win64\UnrealEditor\Development\MultiplayerModule\Module.MultiplayerModule.cpp.obj"
+"C:\Users\Deepak\Documents\Unreal Projects\Take_Em_Down\Take_Em_Down\Plugins\MultiplayerModule\Intermediate\Build\Win64\UnrealEditor\Development\MultiplayerModule\Module.MultiplayerModule.gen.cpp.obj"
+"C:\Users\Deepak\Documents\Unreal Projects\Take_Em_Down\Take_Em_Down\Plugins\MultiplayerModule\Intermediate\Build\Win64\UnrealEditor\Development\MultiplayerModule\Default.rc2.res"
+/OUT:"C:\Users\Deepak\Documents\Unreal Projects\Take_Em_Down\Take_Em_Down\Plugins\MultiplayerModule\Intermediate\Build\Win64\UnrealEditor\Development\MultiplayerModule\UnrealEditor-MultiplayerModule-0009.lib"
