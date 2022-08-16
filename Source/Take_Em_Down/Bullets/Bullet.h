@@ -23,6 +23,10 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr <UStaticMeshComponent> BulletMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<class UParticleSystem> P_FireParticle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<class UProjectileMovementComponent> BullectProjectile;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

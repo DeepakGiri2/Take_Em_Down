@@ -14,8 +14,6 @@ enum class EWeaponState:uint8
 	EWS_Droped UMETA(DisplayName = "EWSDroped_State"),
 	EWS_MAX UMETA(DisplayName = "DefaultMAX_State"),
 };
-class USphereComponent;
-class UWidgetComponent;
 
 UCLASS()
 class TAKE_EM_DOWN_API AWeapon : public AActor
@@ -32,11 +30,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Details")
 	TObjectPtr < USkeletalMeshComponent> WeaponMesh;
 	UPROPERTY(VisibleAnywhere, Category = "Details")
-	TObjectPtr<USphereComponent> AreaSphere;
+	TObjectPtr<class USphereComponent> AreaSphere;
 	UPROPERTY(VisibleAnywhere, Category = "Details")
 	EWeaponState WeaponState;
 	UPROPERTY(VisibleAnywhere, Category = "Details")
-		TObjectPtr <UWidgetComponent> PickUpWidget;
+		TObjectPtr <class UWidgetComponent> PickUpWidget;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

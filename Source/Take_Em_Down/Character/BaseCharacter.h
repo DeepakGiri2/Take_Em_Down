@@ -17,7 +17,7 @@ public:
 private:
 	/*Groom*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))
-		class UGroomComponent* Hair;
+		TObjectPtr<class UGroomComponent> Hair;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UGroomComponent> Eyelashes;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))
@@ -37,10 +37,10 @@ private:
 		TObjectPtr<USkeletalMeshComponent> Legs;
 	/** LodSyncComp **/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-		class ULODSyncComponent* MetaLod;
+		TObjectPtr<class ULODSyncComponent> MetaLod;
 	/** MotionWarping Component **/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-		class UMotionWarpingComponent* MotionWarpingComponent;
+		TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
 
 protected:
 	// Called when the game starts or when spawned
