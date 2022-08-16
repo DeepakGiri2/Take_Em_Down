@@ -75,8 +75,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	FORCEINLINE USpringArmComponent* GetCameraBomm() const { return CameraBoom; }
+	FORCEINLINE TObjectPtr<USpringArmComponent> GetCameraBomm() const { return CameraBoom; }
 
-	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
+	FORCEINLINE TObjectPtr < UCameraComponent> GetCamera() const { return Camera; }
 
 };

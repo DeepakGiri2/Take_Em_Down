@@ -19,22 +19,22 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))
 		class UGroomComponent* Hair;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))
-		UGroomComponent* Eyelashes;
+		TObjectPtr<UGroomComponent> Eyelashes;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))
-		UGroomComponent* Eyebrows;
+		TObjectPtr<UGroomComponent> Eyebrows;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))
-		UGroomComponent* Mustache;
+		TObjectPtr<UGroomComponent> Mustache;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))
-		UGroomComponent* Beard;
+		TObjectPtr<UGroomComponent> Beard;
 	/*SkeletalMesh*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* Face;
+		TObjectPtr <USkeletalMeshComponent> Face;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* Torso;
+		TObjectPtr<USkeletalMeshComponent> Torso;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* Feet;
+		TObjectPtr <USkeletalMeshComponent> Feet;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* Legs;
+		TObjectPtr<USkeletalMeshComponent> Legs;
 	/** LodSyncComp **/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class ULODSyncComponent* MetaLod;
@@ -55,16 +55,16 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	/** Groom **/
-	FORCEINLINE UGroomComponent* GetHair()const { return Hair; }
-	FORCEINLINE UGroomComponent* GetEyelashes()const { return Eyelashes; }
-	FORCEINLINE UGroomComponent* GetEyebrows()const { return Eyebrows; }
-	FORCEINLINE UGroomComponent* GetMustache()const { return Mustache; }
-	FORCEINLINE UGroomComponent* GetBeard()const { return Beard; }
+	FORCEINLINE TObjectPtr<UGroomComponent> GetHair()const { return Hair; }
+	FORCEINLINE TObjectPtr<UGroomComponent> GetEyelashes()const { return Eyelashes; }
+	FORCEINLINE TObjectPtr < UGroomComponent> GetEyebrows()const { return Eyebrows; }
+	FORCEINLINE TObjectPtr<UGroomComponent> GetMustache()const { return Mustache; }
+	FORCEINLINE TObjectPtr < UGroomComponent> GetBeard()const { return Beard; }
 	/** SkeletalMesh **/
-	FORCEINLINE USkeletalMeshComponent* GetFace()const { return Face; }
-	FORCEINLINE USkeletalMeshComponent* GetTorso()const { return Torso; }
-	FORCEINLINE USkeletalMeshComponent* GetFeet()const { return Feet; }
-	FORCEINLINE USkeletalMeshComponent* GetLegs()const { return Legs; }
+	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetFace()const { return Face; }
+	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetTorso()const { return Torso; }
+	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetFeet()const { return Feet; }
+	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetLegs()const { return Legs; }
 	/** LODMANAGER **/
-	FORCEINLINE ULODSyncComponent* GetLODSYNC()const { return MetaLod; }
+	FORCEINLINE TObjectPtr <ULODSyncComponent> GetLODSYNC()const { return MetaLod; }
 };
