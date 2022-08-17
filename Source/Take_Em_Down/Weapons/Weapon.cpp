@@ -4,6 +4,7 @@
 #include "Weapon.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Take_Em_Down/Character/PlayerCharacter.h"
 // Sets default values
 AWeapon::AWeapon()
 {
@@ -32,11 +33,34 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+	if (PickUpWidget)
+	{
+		PickUpWidget->SetVisibility(true);
+	}
 	if (GetLocalRole() == ENetRole::ROLE_Authority)
 	{
 		//Enable Collision Only For Server
 		AreaSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECollisionResponse::ECR_Block);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAreaSphereOverlap);
+	}
+}
+
+void AWeapon::ShowPickUpWidget(bool InVisibility)
+{
+	if (PickUpWidget)
+	{
+		PickUpWidget->SetVisibility(InVisibility);
+	}
+}
+
+void AWeapon::OnAreaSphereOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
+	if (Player && PickUpWidget)
+	{
+		Player->SetOverlappingWeapon(this);
+		PickUpWidget->SetVisibility(true);
 	}
 }
 

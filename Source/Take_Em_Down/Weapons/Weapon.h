@@ -22,10 +22,11 @@ class TAKE_EM_DOWN_API AWeapon : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AWeapon();
-
+	void ShowPickUpWidget(bool InVisibility);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Details")
 	TObjectPtr < USkeletalMeshComponent> WeaponMesh;
@@ -35,6 +36,8 @@ private:
 	EWeaponState WeaponState;
 	UPROPERTY(VisibleAnywhere, Category = "Details")
 		TObjectPtr <class UWidgetComponent> PickUpWidget;
+	UFUNCTION()
+	void OnAreaSphereOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

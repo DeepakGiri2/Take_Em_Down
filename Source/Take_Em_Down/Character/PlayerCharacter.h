@@ -68,6 +68,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = combat, meta = (AllowPrivateAccess = "true"))
 		bool bAiming;
 
+	//
+	UPROPERTY(ReplicatedUsing = OnRep_OnerlappingWeapon)
+	 TObjectPtr<class AWeapon> OverlappingWeapon;
+
+	UFUNCTION()
+	void OnRep_OnerlappingWeapon();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -75,8 +82,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	FORCEINLINE TObjectPtr<USpringArmComponent> GetCameraBomm() const { return CameraBoom; }
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	FORCEINLINE TObjectPtr<USpringArmComponent> GetCameraBoom() const { return CameraBoom; }
 
 	FORCEINLINE TObjectPtr < UCameraComponent> GetCamera() const { return Camera; }
+
+	FORCEINLINE TObjectPtr<AWeapon> GetOverlappingWeapon() const { return OverlappingWeapon; }
+
+	FORCEINLINE void SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon) { OverlappingWeapon = InWeapon; }
 
 };
