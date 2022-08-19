@@ -43,6 +43,7 @@ void AWeapon::BeginPlay()
 		AreaSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECollisionResponse::ECR_Block);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAreaSphereOverlap);
+		AreaSphere->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAreaSphereEndOverlap);
 	}
 }
 
@@ -60,7 +61,15 @@ void AWeapon::OnAreaSphereOverlap(UPrimitiveComponent* OverLappedComponent, AAct
 	if (Player && PickUpWidget)
 	{
 		Player->SetOverlappingWeapon(this);
-		PickUpWidget->SetVisibility(true);
+	}
+}
+
+void AWeapon::OnAreaSphereEndOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex)
+{
+	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
+	if (Player && PickUpWidget)
+	{
+		Player->SetOverlappingWeapon(nullptr);
 	}
 }
 

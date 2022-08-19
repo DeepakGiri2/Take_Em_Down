@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Take_Em_Down/Weapons/Weapon.h"
+#include "Take_Em_Down/Character/PlayerComponents/CombatComponent.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter() :BaseTurnRate(50.f), BaseLookUpRate(50.f), bAiming(false), HipLookUpRate(90.f), HipTurnRate(90.f), AimLookUpRate(20.f), AimTurnRate(20.f),
 MouseHipTurnRate(1.0f), MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f), MouseAimLookUpRate(0.2f)
@@ -32,6 +33,8 @@ MouseHipTurnRate(1.0f), MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f), MouseA
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>("Combat");
+	CombatComponent->SetIsReplicated(true);
 }
 
 void APlayerCharacter::MoveForward(float value)
@@ -102,20 +105,67 @@ void APlayerCharacter::AimingButtonReleased()
 	bAiming = false;
 }
 
+void APlayerCharacter::SelectPressed()
+{
+	if (CombatComponent && HasAuthority())
+	{
+		CombatComponent->EquipWeapon(OverlappingWeapon);
+	}
+}
+
+void APlayerCharacter::SelectReleased()
+{
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+}
+
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (CombatComponent)
+	{
+		CombatComponent->Character = this;
+	}
+}
+
+void APlayerCharacter::OnRep_OnerlappingWeapon(AWeapon* LastWeapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickUpWidget(true);
+	}
+	if (LastWeapon)
+	{
+		LastWeapon->ShowPickUpWidget(false);
+	}
+}
+
+void APlayerCharacter::SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickUpWidget(false);
+	}
+	OverlappingWeapon = InWeapon;
+	if (IsLocallyControlled())
+	{
+		if (OverlappingWeapon)
+		{
+			OverlappingWeapon->ShowPickUpWidget(true);
+		}
+	}
+}
+
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-}
-
-void APlayerCharacter::OnRep_OnerlappingWeapon()
-{
-	if (OverlappingWeapon)
-	{
-		OverlappingWeapon->ShowPickUpWidget(true);
-	}
 }
 
 // Called every frame
@@ -138,10 +188,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("Turn", this, &APlayerCharacter::Turn);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &APlayerCharacter::AimingButtonPressed);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &APlayerCharacter::AimingButtonReleased);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &APlayerCharacter::SelectPressed);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &APlayerCharacter::SelectReleased);
 }
 
-void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon,COND_OwnerOnly);
-}
+

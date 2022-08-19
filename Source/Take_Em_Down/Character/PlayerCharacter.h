@@ -27,6 +27,9 @@ protected:
 	void LookUp(float value);
 	void AimingButtonPressed();
 	void AimingButtonReleased();
+	void SelectPressed();
+	void SelectReleased();
+	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class USpringArmComponent> CameraBoom;
@@ -73,7 +76,10 @@ private:
 	 TObjectPtr<class AWeapon> OverlappingWeapon;
 
 	UFUNCTION()
-	void OnRep_OnerlappingWeapon();
+	void OnRep_OnerlappingWeapon(AWeapon* LastWeapon);
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UCombatComponent> CombatComponent;
 
 public:
 	// Called every frame
@@ -83,6 +89,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void PostInitializeComponents() override;
+
+	void SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon);
 	
 	FORCEINLINE TObjectPtr<USpringArmComponent> GetCameraBoom() const { return CameraBoom; }
 
@@ -90,6 +100,6 @@ public:
 
 	FORCEINLINE TObjectPtr<AWeapon> GetOverlappingWeapon() const { return OverlappingWeapon; }
 
-	FORCEINLINE void SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon) { OverlappingWeapon = InWeapon; }
+	
 
 };

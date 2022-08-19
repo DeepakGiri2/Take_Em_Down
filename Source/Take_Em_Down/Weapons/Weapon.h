@@ -38,8 +38,11 @@ private:
 		TObjectPtr <class UWidgetComponent> PickUpWidget;
 	UFUNCTION()
 	void OnAreaSphereOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnAreaSphereEndOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	FORCEINLINE EWeaponState GetWeaponState() const { return WeaponState; }
+	FORCEINLINE void SetWeaponState(EWeaponState InWeaponState)  { WeaponState = InWeaponState; }
 };
