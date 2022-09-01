@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
+#define TRACE_LENGTH 80000.f
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TAKE_EM_DOWN_API UCombatComponent : public UActorComponent
@@ -17,15 +18,34 @@ public:
 	UCombatComponent();
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	friend class APlayerCharacter;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	void SetAiming(bool bIsAiming);
+	UFUNCTION(Server, Reliable)
+	void Ser_SetAiming(bool bIsAiming);
+	UFUNCTION()
+		void OnRep_EquipedWeapon();
+	void FireButtonPressed(bool bPressed);
+	UFUNCTION(NetMulticast, Reliable)
+		void Multi_Fire(const FVector_NetQuantize& HitLocation);
+	UFUNCTION(Server, Reliable)
+		void Ser_Fire(const FVector_NetQuantize& HitLocation);
+	void TraceUnderCrossHairs(FHitResult& TraceHit);
 private:
-	TObjectPtr <APlayerCharacter> Character;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Details, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr <APlayerCharacter> ACT;
+	UPROPERTY(ReplicatedUsing = OnRep_EquipedWeapon)
 	TObjectPtr<class AWeapon> EquipedWeapon;
+	bool bFireButtonPressed;
+	UPROPERTY(Replicated,VisibleAnywhere, BlueprintReadWrite, Category = combat, meta = (AllowPrivateAccess = "true"))
+		bool bAiming;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Details, meta = (AllowPrivateAccess = "true"))
+	float BaseWalkWalkSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Details, meta = (AllowPrivateAccess = "true"))
+	float AimWalkWalkSpeed;
 public:	
 	void EquipWeapon(TObjectPtr <AWeapon> WeaponToEquip);
-
-		
 };

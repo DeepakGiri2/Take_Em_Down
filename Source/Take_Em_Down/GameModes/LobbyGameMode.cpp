@@ -1,0 +1,27 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "LobbyGameMode.h"
+#include "GameFrameWork/GameStateBase.h"
+void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+	int32 NumberOfPlayers = GameState.Get()->PlayerArray.Num();
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController)
+	{
+		FInputModeGameOnly GameInput;
+		GameInput.SetConsumeCaptureMouseDown(false);
+		PlayerController->SetInputMode(GameInput);
+
+	}
+	if (NumberOfPlayers == 2)
+	{
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			bUseSeamlessTravel = true;
+			World->ServerTravel(FString("/Game/Maps/MultiPlayer/TakeEmDown?listen"));
+		}
+	}
+}

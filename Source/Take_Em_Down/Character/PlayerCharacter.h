@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
+#include "Take_Em_Down/playerStates/TurnInPlace.h"
 #include "PlayerCharacter.generated.h"
 
 /**
@@ -19,16 +20,26 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// Movement
 	void MoveForward(float value);
 	void MoveRight(float value);
-	void TurnAtRate(float Rate);
-	void LookUpRate(float rate);
 	void Turn(float value);
 	void LookUp(float value);
+	void Sprint();
+
+	//FiringStuff
 	void AimingButtonPressed();
 	void AimingButtonReleased();
 	void SelectPressed();
-	void SelectReleased();
+	void FireButtonPressed();
+	void FireButtonReleased();
+	void CrouchButtonPressed();
+
+	//AnimationBp
+	void AimOffset(float DeltaTime);
+	void TurnInPlace(float DeltaTime);
+
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -36,41 +47,23 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UCameraComponent> Camera;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		float BaseTurnRate;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		float BaseLookUpRate;
-	/*Turn Rate While Not Aiming */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		float HipTurnRate;
 
-	/*LookUp Rate While Not Aiming */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		float HipLookUpRate;
+	//Movement
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	bool bIsSprinting;
 
-	/*Turn Rate While Aiming */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		float AimTurnRate;
+	UPROPERTY()
+	float MouseAimLookUpRate;
 
-	/*LookUp Rate While Aiming */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		float AimLookUpRate;
+	UPROPERTY()
+	float MouseHipTurnRate;
 
-	/* Lookup Rates For Mouse*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
-		float MouseHipTurnRate;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
-		float MouseHipLookUpRate;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	UPROPERTY()
 		float MouseAimTurnRate;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
-		float MouseAimLookUpRate;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = combat, meta = (AllowPrivateAccess = "true"))
-		bool bAiming;
-
+	UPROPERTY()
+		float MouseHipLookUpRate;
+	
 	//
 	UPROPERTY(ReplicatedUsing = OnRep_OnerlappingWeapon)
 	 TObjectPtr<class AWeapon> OverlappingWeapon;
@@ -80,6 +73,22 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UCombatComponent> CombatComponent;
+
+	UFUNCTION(Server,Reliable)
+	void Ser_SelectButtonPressed();
+
+	UFUNCTION(Server, Reliable)
+		void Ser_SprintButtonPressed(float Speed);
+	float AO_Yaw;
+	float Interp_AO_Yaw;
+	float AO_Pitch;
+	FRotator StartingAimRotation;
+
+	ETurningInPlace TurinngInPlace;
+
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TObjectPtr<class UAnimMontage> FireWeaponMontage;
 
 public:
 	// Called every frame
@@ -92,13 +101,28 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	void PlayFireMontage(bool bInAiming);
+
 	void SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon);
 	
+	//Anim blurprint
+	bool IsWeaponEquiped();
+
+	bool IsAiming();
+
 	FORCEINLINE TObjectPtr<USpringArmComponent> GetCameraBoom() const { return CameraBoom; }
 
 	FORCEINLINE TObjectPtr < UCameraComponent> GetCamera() const { return Camera; }
 
 	FORCEINLINE TObjectPtr<AWeapon> GetOverlappingWeapon() const { return OverlappingWeapon; }
+
+	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
+
+	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
+
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurinngInPlace; }
+
+	TObjectPtr <AWeapon> GetEquipedWeapon();
 
 	
 

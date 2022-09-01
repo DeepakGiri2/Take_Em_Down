@@ -6,12 +6,15 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Take_Em_Down/Weapons/Weapon.h"
 #include "Take_Em_Down/Character/PlayerComponents/CombatComponent.h"
+#include "Take_Em_Down/Character/Player_Anim/PlayerAnimInstance.h"
+#include "Components/CapsuleComponent.h"
 // Sets default values
-APlayerCharacter::APlayerCharacter() :BaseTurnRate(50.f), BaseLookUpRate(50.f), bAiming(false), HipLookUpRate(90.f), HipTurnRate(90.f), AimLookUpRate(20.f), AimTurnRate(20.f),
-MouseHipTurnRate(1.0f), MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f), MouseAimLookUpRate(0.2f)
+APlayerCharacter::APlayerCharacter() :MouseAimLookUpRate(0.2f), MouseHipTurnRate(1.0f),bIsSprinting(false),
+MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f),TurinngInPlace(ETurningInPlace::ETIP_NotTuring)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -22,19 +25,27 @@ MouseHipTurnRate(1.0f), MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f), MouseA
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	Camera->SetupAttachment(CameraBoom);
 	Camera->SetActive(true);
-	CameraBoom->TargetArmLength = 250;
-	bUseControllerRotationYaw = true;
+	CameraBoom->TargetArmLength = 250.f;
+	CameraBoom->bUsePawnControlRotation = true;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.0f), FRotator(0.f, -90.0f, 0.f));
-	GetCharacterMovement()->JumpZVelocity = 690.f;
-	GetCharacterMovement()->MaxWalkSpeed = 450.f;
-	GetCharacterMovement()->AirControl = 0.3f;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
+
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>("Combat");
 	CombatComponent->SetIsReplicated(true);
+
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.0f), FRotator(0.f, -90.0f, 0.f));
+	GetCharacterMovement()->JumpZVelocity = 350.f;
+	GetCharacterMovement()->MaxWalkSpeed = CombatComponent->BaseWalkWalkSpeed;
+	GetCharacterMovement()->AirControl = 0.3f;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 200.f;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
 }
 
 void APlayerCharacter::MoveForward(float value)
@@ -59,20 +70,10 @@ void APlayerCharacter::MoveRight(float value)
 	}
 }
 
-void APlayerCharacter::TurnAtRate(float Rate)
-{
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
-}
-
-void APlayerCharacter::LookUpRate(float Rate)
-{
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
-}
-
 void APlayerCharacter::Turn(float value)
 {
 	float TurnScaleFactor{};
-	if (bAiming)
+	if (CombatComponent->bAiming)
 	{
 		TurnScaleFactor = MouseAimTurnRate;
 	}
@@ -85,7 +86,7 @@ void APlayerCharacter::Turn(float value)
 void APlayerCharacter::LookUp(float value)
 {
 	float LookUpScaleFactor{};
-	if (bAiming)
+	if (CombatComponent->bAiming)
 	{
 		LookUpScaleFactor = MouseAimLookUpRate;
 	}
@@ -95,27 +96,148 @@ void APlayerCharacter::LookUp(float value)
 	} AddControllerPitchInput(value * LookUpScaleFactor);
 }
 
+void APlayerCharacter::Sprint()
+{
+	if (bIsSprinting)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		if (!HasAuthority())
+		{
+			Ser_SprintButtonPressed(300.f);
+		}
+		bIsSprinting = false;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		if (!HasAuthority())
+		{
+			Ser_SprintButtonPressed(600.f);
+		}
+		bIsSprinting = true;
+	}
+}
+
+
 void APlayerCharacter::AimingButtonPressed()
 {
-	bAiming = true;
+	if (CombatComponent)
+	{
+		CombatComponent->SetAiming(true);
+	}
 }
 
 void APlayerCharacter::AimingButtonReleased()
 {
-	bAiming = false;
+	if (CombatComponent)
+	{
+		CombatComponent->SetAiming(false);
+	}
 }
 
 void APlayerCharacter::SelectPressed()
 {
-	if (CombatComponent && HasAuthority())
+	if (CombatComponent)
 	{
-		CombatComponent->EquipWeapon(OverlappingWeapon);
+		if (HasAuthority())
+		{
+			CombatComponent->EquipWeapon(OverlappingWeapon);
+		}
+		else
+		{
+			Ser_SelectButtonPressed();//ServerEquipButtonPressed
+		}
 	}
 }
 
-void APlayerCharacter::SelectReleased()
+void APlayerCharacter::FireButtonPressed()
 {
+	if (CombatComponent)
+	{
+		CombatComponent->FireButtonPressed(true);
+	}
 }
+
+void APlayerCharacter::FireButtonReleased()
+{
+	if (CombatComponent)
+	{
+		CombatComponent->FireButtonPressed(false);
+	}
+}
+
+void APlayerCharacter::CrouchButtonPressed()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
+	}
+}
+
+void APlayerCharacter::AimOffset(float DeltaTime)
+{
+	if (CombatComponent && !CombatComponent->EquipedWeapon) return;
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	float Speed = Velocity.Size();
+	bool bInAir = GetCharacterMovement()->IsFalling();
+	if (Speed == 0.f && !bInAir) // Standing Not Jumping
+	{
+		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		FRotator DeltaRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+		AO_Yaw = DeltaRotation.Yaw;
+		if (TurinngInPlace == ETurningInPlace::ETIP_NotTuring)
+		{
+			Interp_AO_Yaw = AO_Yaw;
+		}
+		bUseControllerRotationYaw = true;
+		TurnInPlace(DeltaTime);
+	}
+	if (Speed > 0.f || bInAir) // Running And Jumping
+	{
+		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		AO_Yaw = 0.f;
+		bUseControllerRotationYaw = true;
+		TurinngInPlace = ETurningInPlace::ETIP_NotTuring;
+	}
+	AO_Pitch = GetBaseAimRotation().Pitch;
+	if (AO_Pitch > 90.f && !IsLocallyControlled())
+	{
+		// map the Range [270,360] to [-90,0]
+		FVector2D InRange(270.f, 360.f);
+		FVector2D OutRange(-90.f, 0.f);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange,AO_Pitch);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Pitch %f"), AO_Pitch);
+}
+
+void APlayerCharacter::TurnInPlace(float DeltaTime)
+{
+	if (AO_Yaw > 90.f)
+	{
+		TurinngInPlace = ETurningInPlace::ETIP_Right;
+	}
+	else if (AO_Yaw < -90.f)
+	{
+		TurinngInPlace = ETurningInPlace::ETIP_Left;
+	}
+	if (TurinngInPlace != ETurningInPlace::ETIP_NotTuring)
+	{
+		Interp_AO_Yaw = FMath::FInterpTo(Interp_AO_Yaw, 0.f, DeltaTime, 4.f);
+		AO_Yaw = Interp_AO_Yaw;
+		if (FMath::Abs(AO_Yaw) < 15.f)
+		{
+			TurinngInPlace = ETurningInPlace::ETIP_NotTuring;
+			StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		}
+	}
+}
+
+
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
@@ -128,7 +250,20 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	if (CombatComponent)
 	{
-		CombatComponent->Character = this;
+		CombatComponent->ACT = this;
+	}
+}
+
+void APlayerCharacter::PlayFireMontage(bool bInAiming)
+{
+	if (!CombatComponent || !CombatComponent->EquipedWeapon) return;
+	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
+	if (AnimIns && FireWeaponMontage)
+	{
+		AnimIns->Montage_Play(FireWeaponMontage);
+		FName SectionName;
+		SectionName = bInAiming ? FName("Rifle_Aim") : FName("Rifle_Hip");
+		AnimIns->Montage_JumpToSection(SectionName);
 	}
 }
 
@@ -158,6 +293,26 @@ void APlayerCharacter::SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon)
 			OverlappingWeapon->ShowPickUpWidget(true);
 		}
 	}
+	GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Blue, FString("Condition"));
+}
+
+bool APlayerCharacter::IsWeaponEquiped()
+{
+
+	return (CombatComponent && CombatComponent->EquipedWeapon);
+}
+
+bool APlayerCharacter::IsAiming()
+{
+
+	return (CombatComponent && CombatComponent->bAiming);
+}
+
+TObjectPtr<AWeapon> APlayerCharacter::GetEquipedWeapon()
+{
+	if (!CombatComponent) return nullptr;
+	return CombatComponent->EquipedWeapon;
+
 }
 
 
@@ -165,14 +320,26 @@ void APlayerCharacter::SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
+void APlayerCharacter::Ser_SelectButtonPressed_Implementation()//ServerEquipButtonPressed
+{
+	if (CombatComponent)
+	{
+		CombatComponent->EquipWeapon(OverlappingWeapon);
+	}
+}
+
+void APlayerCharacter::Ser_SprintButtonPressed_Implementation(float Speed)
+{
+		GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	AimOffset(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -180,16 +347,19 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	check(PlayerInputComponent)
-		PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("LookUpRate", this, &APlayerCharacter::LookUpRate);
-	PlayerInputComponent->BindAxis("TurnRate", this, &APlayerCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APlayerCharacter::LookUp);
 	PlayerInputComponent->BindAxis("Turn", this, &APlayerCharacter::Turn);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &APlayerCharacter::AimingButtonPressed);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &APlayerCharacter::AimingButtonReleased);
-	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &APlayerCharacter::SelectPressed);
-	PlayerInputComponent->BindAction("Aim", IE_Released, this, &APlayerCharacter::SelectReleased);
+	PlayerInputComponent->BindAction("E", IE_Pressed, this, &APlayerCharacter::SelectPressed);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::FireButtonPressed);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::FireButtonReleased);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerCharacter::Sprint);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::CrouchButtonPressed);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping); 
 }
 
 

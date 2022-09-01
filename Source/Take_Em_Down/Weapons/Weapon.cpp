@@ -5,6 +5,9 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Take_Em_Down/Character/PlayerCharacter.h"
+#include "Net/UnrealNetwork.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Animation/AnimationAsset.h"
 // Sets default values
 AWeapon::AWeapon()
 {
@@ -35,15 +38,21 @@ void AWeapon::BeginPlay()
 	Super::BeginPlay();
 	if (PickUpWidget)
 	{
-		PickUpWidget->SetVisibility(true);
+		PickUpWidget->SetVisibility(false);
 	}
 	if (GetLocalRole() == ENetRole::ROLE_Authority)
 	{
 		//Enable Collision Only For Server
-		AreaSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECollisionResponse::ECR_Block);
+
+		AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		AreaSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECollisionResponse::ECR_Overlap);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAreaSphereOverlap);
 		AreaSphere->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAreaSphereEndOverlap);
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Cyan, FString("Function"));
+		}
 	}
 }
 
@@ -55,6 +64,14 @@ void AWeapon::ShowPickUpWidget(bool InVisibility)
 	}
 }
 
+void AWeapon::Fire(const FVector& HitLocation)
+{
+	if (FireAnimation)
+	{
+		WeaponMesh->PlayAnimation(FireAnimation, false);
+	}
+}
+
 void AWeapon::OnAreaSphereOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
@@ -62,6 +79,7 @@ void AWeapon::OnAreaSphereOverlap(UPrimitiveComponent* OverLappedComponent, AAct
 	{
 		Player->SetOverlappingWeapon(this);
 	}
+	GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Cyan, FString("Function"));
 }
 
 void AWeapon::OnAreaSphereEndOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex)
@@ -73,10 +91,54 @@ void AWeapon::OnAreaSphereEndOverlap(UPrimitiveComponent* OverLappedComponent, A
 	}
 }
 
+void AWeapon::SetWeaponState(EWeaponState InWeaponState)
+{
+	WeaponState = InWeaponState;
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equiped:
+		ShowPickUpWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EWeaponState::EWS_Droped:
+		break;
+	case EWeaponState::EWS_Fresh:
+		break;
+	case EWeaponState::EWS_MAX:
+		break;
+	}
+}
+
+void AWeapon::OnRep_WeaponState()
+{
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equiped:
+		ShowPickUpWidget(false);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EWeaponState::EWS_Droped:
+		break;
+	case EWeaponState::EWS_Fresh:
+		break;
+	case EWeaponState::EWS_MAX:
+		break;
+	}
+}
+
 // Called every frame
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
+
+void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AWeapon, WeaponState);
+}
+
+
 

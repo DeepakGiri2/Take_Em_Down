@@ -23,6 +23,7 @@ public:
 	// Sets default values for this actor's properties
 	AWeapon();
 	void ShowPickUpWidget(bool InVisibility);
+	virtual void Fire(const FVector& HitLocation);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -32,17 +33,25 @@ private:
 	TObjectPtr < USkeletalMeshComponent> WeaponMesh;
 	UPROPERTY(VisibleAnywhere, Category = "Details")
 	TObjectPtr<class USphereComponent> AreaSphere;
-	UPROPERTY(VisibleAnywhere, Category = "Details")
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponState,VisibleAnywhere, Category = "Details")
 	EWeaponState WeaponState;
 	UPROPERTY(VisibleAnywhere, Category = "Details")
 		TObjectPtr <class UWidgetComponent> PickUpWidget;
+	UPROPERTY(EditAnywhere, Category = "Details")
+	TObjectPtr <class UAnimationAsset> FireAnimation;
 	UFUNCTION()
 	void OnAreaSphereOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void OnAreaSphereEndOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex);
+	UFUNCTION()
+		void OnRep_WeaponState();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE EWeaponState GetWeaponState() const { return WeaponState; }
-	FORCEINLINE void SetWeaponState(EWeaponState InWeaponState)  { WeaponState = InWeaponState; }
+	void SetWeaponState(EWeaponState InWeaponState);
+	FORCEINLINE TObjectPtr<USphereComponent> GetAreaSphere() const { return AreaSphere; }
+	FORCEINLINE void SetAreaSphere(TObjectPtr<USphereComponent> InAreaSphere) { AreaSphere = InAreaSphere; }
+	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetWeaponMesh() const { return WeaponMesh; }
 };

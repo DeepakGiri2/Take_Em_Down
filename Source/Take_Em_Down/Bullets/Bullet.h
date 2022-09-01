@@ -19,12 +19,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	UFUNCTION()
-		void OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	virtual	void OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 private:
+	UPROPERTY(EditAnywhere, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
+		TObjectPtr <class UBoxComponent> BulletCollision;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr <UStaticMeshComponent> BulletMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UParticleSystem> P_FireParticle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<UParticleSystem> P_TracerParticles;
+	TObjectPtr<class UParticleSystemComponent> PC_TracerComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UProjectileMovementComponent> BullectProjectile;
 public:	

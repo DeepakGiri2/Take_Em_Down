@@ -4,6 +4,9 @@
 #include "Bullet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
@@ -11,14 +14,39 @@ ABullet::ABullet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
+	BulletCollision = CreateDefaultSubobject<UBoxComponent>("Collision");
+	SetRootComponent(BulletCollision);
+	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	BulletMesh->SetupAttachment(BulletCollision);
+	BulletCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BulletCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	BulletCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Block);
+	BulletCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 	BullectProjectile = CreateDefaultSubobject<UProjectileMovementComponent>("BullectProjectile");
+	BullectProjectile->bRotationFollowsVelocity = true;
 }
 
 // Called when the game starts or when spawned
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
-	BulletMesh->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
+	if (P_TracerParticles)
+	{
+		PC_TracerComponent = UGameplayStatics::SpawnEmitterAttached(
+			P_TracerParticles,
+			BulletCollision,
+			FName(),
+			GetActorLocation(),
+			GetActorRotation(),
+			EAttachLocation::KeepWorldPosition
+		);
+	}
+	if (HasAuthority())
+	{
+		BulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
+	}
 }
 
 void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

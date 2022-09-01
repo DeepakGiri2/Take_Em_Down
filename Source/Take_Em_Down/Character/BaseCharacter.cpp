@@ -23,6 +23,13 @@ ABaseCharacter::ABaseCharacter()
 	Feet->SetupAttachment(GetMesh());
 	Legs->SetupAttachment(GetMesh());
 
+	/** Set Mesh Collision Response **/
+	Face->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	Torso->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	Feet->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	Legs->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
 	/** Groom **/
 	Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("HAIR"));
 	Eyelashes = CreateDefaultSubobject<UGroomComponent>(TEXT("EYELASH"));
