@@ -16,7 +16,7 @@ class MULTIPLAYERMODULE_API UMultiplayerMenu : public UUserWidget
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable)
-		void MenuSetup(int32 NumberPublicConnection = 4, FString TypeofMatch = FString(TEXT("FreeForAll")),FString LobbyPath = FString(TEXT("/Game/ThirdPerson/Maps/Lobby")));
+		UMultiplayerMenu* MenuSetup(int32 NumberPublicConnection = 4, FString TypeofMatch = FString(TEXT("FreeForAll")),FString LobbyPath = FString(TEXT("/Game/ThirdPerson/Maps/Lobby")));
 protected:
 	virtual bool Initialize() override;
 	virtual void OnLevelRemovedFromWorld(ULevel* InLevel,UWorld* InWorld)override;

@@ -56,20 +56,8 @@ void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 	if (Hit.bBlockingHit)
 	{
 
-		if (GetVelocity().Size() < 5000 && PC_TracerComponent)
+		if (GetVelocity().Size() < 200 && BullectProjectile)
 		{
-			if (PC_TracerComponent)
-			{
-				PC_TracerComponent->Deactivate();
-			}
-		}
-		else if (GetVelocity().Size() < 200 && BullectProjectile)
-		{
-			BullectProjectile->Deactivate();
-			BullectProjectile->DestroyComponent();
-			SetRootComponent(BulletMesh);
-			BulletCollision->DestroyComponent();
-			BulletMesh->SetRelativeLocationAndRotation(FVector(-0.544851f, 0.f, 0.f), FRotator(0.f, -89.999999f, 0.f));
 			BulletMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			BulletMesh->SetSimulatePhysics(true);
 		}

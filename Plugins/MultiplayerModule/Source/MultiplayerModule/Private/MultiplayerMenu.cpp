@@ -7,7 +7,7 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 
-void UMultiplayerMenu::MenuSetup(int32 NumberPublicConnection, FString TypeofMatch, FString LobbyPath)
+UMultiplayerMenu* UMultiplayerMenu::MenuSetup(int32 NumberPublicConnection, FString TypeofMatch, FString LobbyPath)
 {
 	PathToLobby = FString::Printf(TEXT("%s?listen"), *LobbyPath);
 	NumPublicConnection = NumberPublicConnection;
@@ -45,6 +45,7 @@ void UMultiplayerMenu::MenuSetup(int32 NumberPublicConnection, FString TypeofMat
 		MultiplayerModuleSubSystem->MultiplayerOnDestroySessionComplete.AddDynamic(this, &ThisClass::OnDestroySession);
 		MultiplayerModuleSubSystem->MultiplayerOnStartSessionComplete.AddDynamic(this, &ThisClass::OnStartSession);
 	}
+	return this;
 }
 
 

@@ -8,6 +8,7 @@
 #include "UObject/ScriptMacros.h"
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
+class UMultiplayerMenu;
 #ifdef MULTIPLAYERMODULE_MultiplayerMenu_generated_h
 #error "MultiplayerMenu.generated.h already included, missing '#pragma once' in MultiplayerMenu.h"
 #endif

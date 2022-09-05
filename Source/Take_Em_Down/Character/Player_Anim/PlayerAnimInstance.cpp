@@ -54,13 +54,13 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		LeftHandTransform = EquipedWeapon->GetWeaponMesh()->GetSocketTransform(FName("LHS"), ERelativeTransformSpace::RTS_World);
 		FVector OutLoc;
 		FRotator OutRot;
-		ACT->GetMesh()->TransformToBoneSpace(FName("hand_r"), LeftHandTransform.GetLocation(), FRotator::ZeroRotator, OutLoc, OutRot);
+		ACT->GetMesh()->TransformToBoneSpace(FName("hand_r"), LeftHandTransform.GetLocation(), LeftHandTransform.GetRotation().Rotator(), OutLoc, OutRot);
 		LeftHandTransform.SetLocation(OutLoc);
 		LeftHandTransform.SetRotation(FQuat(OutRot));
 		if (ACT->IsLocallyControlled())
 		{
 			bLocallyControlled = true;
-			FTransform RightHandTransform = EquipedWeapon->GetWeaponMesh()->GetSocketTransform(FName("Hand_R"), ERelativeTransformSpace::RTS_World);
+			FTransform RightHandTransform = EquipedWeapon->GetWeaponMesh()->GetSocketTransform(FName("hand_r"), ERelativeTransformSpace::RTS_World);
 			RightHandRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(), RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - ACT->GetHitTarget()));
 		}
 	}
