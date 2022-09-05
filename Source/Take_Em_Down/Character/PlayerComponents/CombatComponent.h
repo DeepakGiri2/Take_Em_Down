@@ -52,6 +52,8 @@ private:
 	// Crosshair
 	float CrosshairVelocityFactor;
 	float CrosshairInAirFactor;
+	//Aiming Hand Correction
+	FVector HitTarget;
 public:	
 	void EquipWeapon(TObjectPtr <AWeapon> WeaponToEquip);
 };

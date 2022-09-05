@@ -326,6 +326,12 @@ TObjectPtr<AWeapon> APlayerCharacter::GetEquipedWeapon()
 
 }
 
+FVector APlayerCharacter::GetHitTarget() const
+{
+	if (!CombatComponent) return FVector();
+	return CombatComponent->HitTarget;
+}
+
 
 
 

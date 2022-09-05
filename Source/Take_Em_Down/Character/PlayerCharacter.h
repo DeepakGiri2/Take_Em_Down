@@ -127,6 +127,7 @@ public:
 
 	TObjectPtr <AWeapon> GetEquipedWeapon();
 
-	
+	/* Aim At Correct Direction */
+	FVector GetHitTarget() const;
 
 };

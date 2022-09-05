@@ -38,6 +38,12 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	SetHUDCrossHairs(DeltaTime);
+	if (ACT && ACT->IsLocallyControlled())
+	{
+		FHitResult HitResult;
+		TraceUnderCrossHairs(HitResult);
+		HitTarget = HitResult.ImpactPoint;
+	}
 	// ...
 }
 

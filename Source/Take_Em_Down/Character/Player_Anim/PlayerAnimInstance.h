@@ -59,4 +59,11 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = Weapons, meta = (AllowPrivateAccess = "true"))
 	ETurningInPlace TurinngInPlace;
 
+	/* Hand Weapon Pointing Direction */
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+		FRotator RightHandRotation;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+		bool bLocallyControlled;
+
 };
