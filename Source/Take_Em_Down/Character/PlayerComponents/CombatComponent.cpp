@@ -10,6 +10,8 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "Take_Em_Down/PlayerController/ACTPlayerController.h"
+#include "Take_Em_Down/UI/ACTHUD.h"
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent() :bFireButtonPressed(false), bAiming(false),BaseWalkWalkSpeed(300),
 AimWalkWalkSpeed(250)
@@ -30,6 +32,20 @@ void UCombatComponent::BeginPlay()
 
 	// ...
 	
+}
+
+void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	SetHUDCrossHairs(DeltaTime);
+	// ...
+}
+
+void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UCombatComponent, EquipedWeapon);
+	DOREPLIFETIME(UCombatComponent, bAiming);
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming)
@@ -92,6 +108,63 @@ void UCombatComponent::TraceUnderCrossHairs(FHitResult& TraceHit)
 		FVector End = Start + CrosshairWorldDirection * TRACE_LENGTH;
 
 		GetWorld()->LineTraceSingleByChannel(TraceHit,Start,End,	ECollisionChannel::ECC_GameTraceChannel2);
+		if (!TraceHit.bBlockingHit)
+		{
+			TraceHit.ImpactPoint = End;
+		}
+	}
+}
+
+void UCombatComponent::SetHUDCrossHairs(float Deltatime)
+{
+	if (ACT == nullptr || ACT->Controller == nullptr) return;
+
+	ACTController = ACTController == nullptr ? Cast<AACTPlayerController>(ACT->Controller) : ACTController;
+	if (ACTController)
+	{
+		ACTHUD = ACTHUD == nullptr ? Cast<AACTHUD>(ACTController->GetHUD()) : ACTHUD;
+		if (ACTHUD)
+		{
+			FHUDCollection HUDPackage;
+			if (EquipedWeapon)
+			{
+				HUDPackage.CrossHairCenter = EquipedWeapon->CrossHairCenter;
+				HUDPackage.CrossHairLeft = EquipedWeapon->CrossHairLeft;
+				HUDPackage.CrossHairRight = EquipedWeapon->CrossHairRight;
+				HUDPackage.CrossHairBottom = EquipedWeapon->CrossHairBottom;
+				HUDPackage.CrossHairTop = EquipedWeapon->CrossHairTop;
+			}
+			else
+			{
+				HUDPackage.CrossHairCenter = nullptr;
+				HUDPackage.CrossHairLeft = nullptr;
+				HUDPackage.CrossHairRight = nullptr;
+				HUDPackage.CrossHairBottom = nullptr;
+				HUDPackage.CrossHairTop = nullptr;
+			}
+			// Calculate crosshair spread
+
+			// [0, 600] -> [0, 1]
+			FVector2D WalkSpeedRange(0.f, ACT->GetCharacterMovement()->MaxWalkSpeed);
+			FVector2D VelocityMultiplierRange(0.f, 1.f);
+			FVector Velocity = ACT->GetVelocity();
+			Velocity.Z = 0.f;
+
+			CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(WalkSpeedRange, VelocityMultiplierRange, Velocity.Size());
+
+			if (ACT->GetCharacterMovement()->IsFalling())
+			{
+				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 2.25f, Deltatime, 2.25f);
+			}
+			else
+			{
+				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, Deltatime, 30.f);
+			}
+
+			HUDPackage.CrosshairSpread = CrosshairVelocityFactor + CrosshairInAirFactor;
+
+			ACTHUD->SetHudCollection(HUDPackage);
+		}
 	}
 }
 
@@ -126,19 +199,4 @@ void UCombatComponent::EquipWeapon(TObjectPtr<AWeapon> WeaponToEquip)
 	ACT->bUseControllerRotationYaw = true;
 }
 
-
-// Called every frame
-void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	// ...
-}
-
-void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(UCombatComponent, EquipedWeapon);
-	DOREPLIFETIME(UCombatComponent, bAiming);
-}
 

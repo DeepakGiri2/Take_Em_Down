@@ -47,6 +47,24 @@ MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f),TurinngInPlace(ETurningInPlace:
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
 }
+// Called when the game starts or when spawned
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+// Called every frame
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	AimOffset(DeltaTime);
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+}
 
 void APlayerCharacter::MoveForward(float value)
 {
@@ -238,13 +256,6 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 }
 
 
-
-void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
-}
-
 void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -316,11 +327,7 @@ TObjectPtr<AWeapon> APlayerCharacter::GetEquipedWeapon()
 }
 
 
-// Called when the game starts or when spawned
-void APlayerCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-}
+
 
 void APlayerCharacter::Ser_SelectButtonPressed_Implementation()//ServerEquipButtonPressed
 {
@@ -333,13 +340,6 @@ void APlayerCharacter::Ser_SelectButtonPressed_Implementation()//ServerEquipButt
 void APlayerCharacter::Ser_SprintButtonPressed_Implementation(float Speed)
 {
 		GetCharacterMovement()->MaxWalkSpeed = Speed;
-}
-
-// Called every frame
-void APlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	AimOffset(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -359,7 +359,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerCharacter::Sprint);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::CrouchButtonPressed);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping); 
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 }
 
 

@@ -34,9 +34,12 @@ protected:
 	UFUNCTION(Server, Reliable)
 		void Ser_Fire(const FVector_NetQuantize& HitLocation);
 	void TraceUnderCrossHairs(FHitResult& TraceHit);
+	void SetHUDCrossHairs(float Deltatime);
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Details, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr <APlayerCharacter> ACT;
+	TObjectPtr <class AACTPlayerController> ACTController;
+	TObjectPtr <class AACTHUD> ACTHUD;
 	UPROPERTY(ReplicatedUsing = OnRep_EquipedWeapon)
 	TObjectPtr<class AWeapon> EquipedWeapon;
 	bool bFireButtonPressed;
@@ -46,6 +49,9 @@ private:
 	float BaseWalkWalkSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Details, meta = (AllowPrivateAccess = "true"))
 	float AimWalkWalkSpeed;
+	// Crosshair
+	float CrosshairVelocityFactor;
+	float CrosshairInAirFactor;
 public:	
 	void EquipWeapon(TObjectPtr <AWeapon> WeaponToEquip);
 };

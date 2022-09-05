@@ -7,6 +7,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "DrawDebugHelpers.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
@@ -47,13 +48,72 @@ void ABullet::BeginPlay()
 	{
 		BulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
 	}
+	Debug.Add(this->GetActorLocation());
 }
 
 void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (Hit.bBlockingHit)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, Hit.Location, FRotator(0.f, 0.f, 0.f));
+
+		if (GetVelocity().Size() < 5000 && PC_TracerComponent)
+		{
+			if (PC_TracerComponent)
+			{
+				PC_TracerComponent->Deactivate();
+			}
+		}
+		else if (GetVelocity().Size() < 200 && BullectProjectile)
+		{
+			BullectProjectile->Deactivate();
+			BullectProjectile->DestroyComponent();
+			SetRootComponent(BulletMesh);
+			BulletCollision->DestroyComponent();
+			BulletMesh->SetRelativeLocationAndRotation(FVector(-0.544851f, 0.f, 0.f), FRotator(0.f, -89.999999f, 0.f));
+			BulletMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			BulletMesh->SetSimulatePhysics(true);
+		}
+		else
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, Hit.Location, FRotator(0.f, 0.f, 0.f));
+		}
+	}
+	SpawnEffects(Hit);
+	Debug.Add(Hit.Location);
+	if (Debug.Num() > 1)
+	{
+		DrawDebugLine(GetWorld(), Debug[Debug.Num() - 2], Debug[Debug.Num() - 1], FColor::Blue,true);
+	}
+	DrawDebugSphere(GetWorld(), Hit.Location, 5.f, 4, FColor::Blue,true);
+	
+}
+
+void ABullet::SpawnEffects_Implementation(const FHitResult& Hit)
+{
+	if (Hit.bBlockingHit)
+	{
+	
+		if (GetVelocity().Size() < 5000)
+		{
+			if (PC_TracerComponent)
+			{
+				PC_TracerComponent->DestroyComponent();
+			}
+		}
+		else if (GetVelocity().Size() < 200 && BullectProjectile)
+		{
+			if (BullectProjectile)
+			{
+				BullectProjectile->Deactivate();
+				BullectProjectile->DestroyComponent();
+			}
+			BulletMesh->SetSimulatePhysics(true);
+		}
+		else
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, Hit.Location, FRotator(0.f, 0.f, 0.f));
+		}
+
 	}
 }
 

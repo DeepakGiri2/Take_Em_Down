@@ -20,6 +20,8 @@ protected:
 	virtual void BeginPlay() override;
 	UFUNCTION()
 	virtual	void OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION(NetMulticast, Reliable)
+	virtual	void SpawnEffects(const FHitResult& Hit);
 private:
 	UPROPERTY(EditAnywhere, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr <class UBoxComponent> BulletCollision;
@@ -32,6 +34,7 @@ private:
 	TObjectPtr<class UParticleSystemComponent> PC_TracerComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UProjectileMovementComponent> BullectProjectile;
+	TArray < FVector > Debug;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

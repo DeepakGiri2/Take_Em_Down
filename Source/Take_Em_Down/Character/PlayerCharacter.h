@@ -27,6 +27,7 @@ protected:
 	void Turn(float value);
 	void LookUp(float value);
 	void Sprint();
+	// Movement
 
 	//FiringStuff
 	void AimingButtonPressed();
@@ -35,11 +36,12 @@ protected:
 	void FireButtonPressed();
 	void FireButtonReleased();
 	void CrouchButtonPressed();
+	//FiringStuff
 
 	//AnimationBp
 	void AimOffset(float DeltaTime);
 	void TurnInPlace(float DeltaTime);
-
+	//Animation BP
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -83,12 +85,13 @@ private:
 	float Interp_AO_Yaw;
 	float AO_Pitch;
 	FRotator StartingAimRotation;
-
 	ETurningInPlace TurinngInPlace;
 
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<class UAnimMontage> FireWeaponMontage;
+
+
 
 public:
 	// Called every frame

@@ -24,6 +24,16 @@ public:
 	AWeapon();
 	void ShowPickUpWidget(bool InVisibility);
 	virtual void Fire(const FVector& HitLocation);
+	UPROPERTY(EditAnywhere, Category = "CrossHair")
+		TObjectPtr<class UTexture2D> CrossHairCenter;
+	UPROPERTY(EditAnywhere, Category = "CrossHair")
+		TObjectPtr<UTexture2D> CrossHairLeft;
+	UPROPERTY(EditAnywhere, Category = "CrossHair")
+		TObjectPtr<UTexture2D> CrossHairRight;
+	UPROPERTY(EditAnywhere, Category = "CrossHair")
+		TObjectPtr<UTexture2D> CrossHairTop;
+	UPROPERTY(EditAnywhere, Category = "CrossHair")
+		TObjectPtr<UTexture2D> CrossHairBottom;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -45,6 +55,12 @@ private:
 		void OnAreaSphereEndOverlap(UPrimitiveComponent* OverLappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherbodyIndex);
 	UFUNCTION()
 		void OnRep_WeaponState();
+	UPROPERTY(EditAnywhere, Category = "Details")
+		TSubclassOf<class ABulletShells> BulletShellActor;
+	/*
+	* Texture for Weapon Crosshairs
+	*/
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

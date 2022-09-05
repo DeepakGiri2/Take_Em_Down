@@ -31,6 +31,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsCrouched = ACT->bIsCrouched;
 	bAiming = ACT->IsAiming();
 	TurinngInPlace = ACT->GetTurningInPlace();
+	
 
 	//YawOffset
 	FRotator AimRotation = ACT->GetBaseAimRotation();
