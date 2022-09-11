@@ -85,6 +85,9 @@ private:
 	UFUNCTION(Server,Reliable)
 	void Ser_SelectButtonPressed();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_SelectButtonPressed();
+
 	UFUNCTION(Server, Reliable)
 		void Ser_SprintButtonPressed(float Speed);
 	float AO_Yaw;
@@ -138,6 +141,8 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurinngInPlace; }
 
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return Camera; }
+
+	FORCEINLINE bool GetIsServer() const { return HasAuthority(); }
 
 	TObjectPtr <AWeapon> GetEquipedWeapon();
 

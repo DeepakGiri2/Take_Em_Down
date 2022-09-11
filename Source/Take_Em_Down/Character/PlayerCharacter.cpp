@@ -199,14 +199,17 @@ void APlayerCharacter::SelectPressed()
 {
 	if (CombatComponent)
 	{
-		if (HasAuthority())
+		CombatComponent->EquipWeapon(OverlappingWeapon);
+		Ser_SelectButtonPressed();//ServerEquipButtonPressed
+	  /*if (HasAuthority())
 		{
 			CombatComponent->EquipWeapon(OverlappingWeapon);
+			GEngine->AddOnScreenDebugMessage(2, 4, FColor::Black, FString("Server Da"));
 		}
 		else
 		{
 			Ser_SelectButtonPressed();//ServerEquipButtonPressed
-		}
+		}*/
 	}
 }
 
@@ -332,6 +335,14 @@ void APlayerCharacter::OnRep_OnerlappingWeapon(AWeapon* LastWeapon)
 	}
 }
 
+void APlayerCharacter::Multi_SelectButtonPressed_Implementation()
+{
+	if (CombatComponent)
+	{
+		CombatComponent->EquipWeapon(OverlappingWeapon);
+	}
+}
+
 void APlayerCharacter::SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon)
 {
 	if (OverlappingWeapon)
@@ -391,10 +402,7 @@ FVector APlayerCharacter::GetHitTarget() const
 
 void APlayerCharacter::Ser_SelectButtonPressed_Implementation()//ServerEquipButtonPressed
 {
-	if (CombatComponent)
-	{
-		CombatComponent->EquipWeapon(OverlappingWeapon);
-	}
+	Multi_SelectButtonPressed();
 }
 
 void APlayerCharacter::Ser_SprintButtonPressed_Implementation(float Speed)

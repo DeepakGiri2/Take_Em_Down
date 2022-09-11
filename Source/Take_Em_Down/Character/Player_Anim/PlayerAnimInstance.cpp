@@ -31,7 +31,14 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsCrouched = ACT->bIsCrouched;
 	bAiming = ACT->IsAiming();
 	TurinngInPlace = ACT->GetTurningInPlace();
-	
+	if (!ACT->GetIsServer())
+	{
+		GEngine->AddOnScreenDebugMessage(0, 0.2, FColor::Red, FString::Printf(TEXT("Bool: %s"), bIsEqupiedWeapon ? TEXT("true") : TEXT("false")));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(1, 0.2, FColor::Blue, FString::Printf(TEXT("Bool: %s"), bIsEqupiedWeapon ? TEXT("true") : TEXT("false")));
+	}
 
 	//YawOffset
 	FRotator AimRotation = ACT->GetBaseAimRotation();
@@ -62,7 +69,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 			bLocallyControlled = true;
 			FTransform RightHandTransform = EquipedWeapon->GetWeaponMesh()->GetSocketTransform(FName("hand_r"), ERelativeTransformSpace::RTS_World);
 			FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(), RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - ACT->GetHitTarget()));
-			RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaTime, 30.f);
+			RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaTime, 8.f);
 		}
 	}
 }
