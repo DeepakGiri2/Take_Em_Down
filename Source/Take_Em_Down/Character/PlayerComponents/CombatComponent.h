@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Take_Em_Down/UI/ACTHUD.h"
 #include "CombatComponent.generated.h"
 
 #define TRACE_LENGTH 80000.f
@@ -55,6 +56,7 @@ private:
 	float CrosshairAimFactor;
 	float CrosshairFireFactor;
 	float CrosshairInAirFactor;
+	FHUDCollection HUDPackage;
 	//Aiming Hand Correction
 	FVector HitTarget;
 

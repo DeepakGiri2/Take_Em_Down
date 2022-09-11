@@ -9,6 +9,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Take_Em_Down/Character/PlayerCharacter.h"
+
 
 // Sets default values
 ABullet::ABullet()
@@ -73,6 +75,11 @@ void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 		DrawDebugLine(GetWorld(), Debug[Debug.Num() - 2], Debug[Debug.Num() - 1], FColor::Blue,true);
 	}
 	DrawDebugSphere(GetWorld(), Hit.Location, 5.f, 4, FColor::Blue,true);
+	APlayerCharacter* ACT = Cast<APlayerCharacter>(OtherActor);
+	if (ACT)
+	{
+		ACT->PlayHitReactMontage();
+	}
 	
 }
 

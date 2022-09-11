@@ -12,9 +12,10 @@
 #include "Take_Em_Down/Character/PlayerComponents/CombatComponent.h"
 #include "Take_Em_Down/Character/Player_Anim/PlayerAnimInstance.h"
 #include "Components/CapsuleComponent.h"
+#include "GroomComponent.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter() :MouseAimLookUpRate(0.2f), MouseHipTurnRate(1.0f),bIsSprinting(false),
-MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f),TurinngInPlace(ETurningInPlace::ETIP_NotTuring)
+MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f),TurinngInPlace(ETurningInPlace::ETIP_NotTuring), CameraThreshold(100.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -53,11 +54,52 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+void APlayerCharacter::HideCharacterWhileOverlapping()
+{
+	if (!IsLocallyControlled()) return;
+	if ((Camera->GetComponentLocation() - GetActorLocation()).Size() < CameraThreshold)
+	{
+		GetMesh()->SetVisibility(false);
+		GetFace()->SetVisibility(false);
+		GetTorso()->SetVisibility(false);
+		GetFeet()->SetVisibility(false);
+		GetLegs()->SetVisibility(false);
+		GetHair()->SetVisibility(false);
+		GetEyelashes()->SetVisibility(false);
+		GetEyebrows()->SetVisibility(false);
+		GetMustache()->SetVisibility(false);
+		GetBeard()->SetVisibility(false);
+		if (CombatComponent && CombatComponent->EquipedWeapon && CombatComponent->EquipedWeapon->GetWeaponMesh())
+		{
+			CombatComponent->EquipedWeapon->GetWeaponMesh()->bOwnerNoSee = true;
+		}
+	}
+	else
+	{
+		GetMesh()->SetVisibility(true);
+		GetFace()->SetVisibility(true);
+		GetTorso()->SetVisibility(true);
+		GetFeet()->SetVisibility(true);
+		GetLegs()->SetVisibility(true);
+		GetHair()->SetVisibility(true);
+		GetEyelashes()->SetVisibility(true);
+		GetEyebrows()->SetVisibility(true);
+		GetMustache()->SetVisibility(true);
+		GetBeard()->SetVisibility(true);	
+		if (CombatComponent && CombatComponent->EquipedWeapon && CombatComponent->EquipedWeapon->GetWeaponMesh())
+		{
+			CombatComponent->EquipedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
+		}
+	}
+}
+
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	AimOffset(DeltaTime);
+	HideCharacterWhileOverlapping();
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -305,6 +347,18 @@ void APlayerCharacter::SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon)
 		}
 	}
 	GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Blue, FString("Condition"));
+}
+
+void APlayerCharacter::PlayHitReactMontage()
+{
+	if (!CombatComponent || !CombatComponent->EquipedWeapon) return;
+	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
+	if (AnimIns && HitReactMontage)
+	{
+		AnimIns->Montage_Play(HitReactMontage);
+		FName SectionName = FName("FromCenter");
+		AnimIns->Montage_JumpToSection(SectionName);
+	}
 }
 
 bool APlayerCharacter::IsWeaponEquiped()

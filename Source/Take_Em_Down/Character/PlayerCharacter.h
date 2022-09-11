@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "Take_Em_Down/playerStates/TurnInPlace.h"
+#include "Take_Em_Down/Interface/CrossHairInterface.h"
 #include "PlayerCharacter.generated.h"
 
 /**
  *
  */
 UCLASS()
-class TAKE_EM_DOWN_API APlayerCharacter : public ABaseCharacter
+class TAKE_EM_DOWN_API APlayerCharacter : public ABaseCharacter, public ICrossHairInterface
 {
 	GENERATED_BODY()
 public:
@@ -42,6 +43,11 @@ protected:
 	void AimOffset(float DeltaTime);
 	void TurnInPlace(float DeltaTime);
 	//Animation BP
+
+	//CameraHide
+	void HideCharacterWhileOverlapping();
+	//CameraHide
+
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -90,9 +96,13 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<class UAnimMontage> FireWeaponMontage;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TObjectPtr<UAnimMontage> HitReactMontage;
 
+	UPROPERTY(EditAnywhere)
+		float CameraThreshold;
 
-
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -105,6 +115,8 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	void PlayFireMontage(bool bInAiming);
+
+	void PlayHitReactMontage();
 
 	void SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon);
 	

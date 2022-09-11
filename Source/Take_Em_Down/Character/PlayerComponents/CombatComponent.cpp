@@ -12,10 +12,10 @@
 #include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Take_Em_Down/PlayerController/ACTPlayerController.h"
-#include "Take_Em_Down/UI/ACTHUD.h"
+//#include "Take_Em_Down/UI/ACTHUD.h"
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent() :bFireButtonPressed(false), bAiming(false),BaseWalkWalkSpeed(300),
-AimWalkWalkSpeed(250), ZoomedFOV(30), ZoomInterpSpeed(20)
+AimWalkWalkSpeed(250), ZoomedFOV(30), ZoomInterpSpeed(20),CrosshairAimFactor(0.f),CrosshairFireFactor(0.f)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -123,7 +123,7 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 		Ser_Fire(Hit.ImpactPoint);
 		if (EquipedWeapon)
 		{
-			CrosshairFireFactor = 0.2f;
+			CrosshairFireFactor = 0.95f;
 		}
 	}
 }
@@ -143,13 +143,26 @@ void UCombatComponent::TraceUnderCrossHairs(FHitResult& TraceHit)
 	if (bScreenToWorld)
 	{
 		FVector Start = CrosshairWorldPosition;
-
+		if (ACT)
+		{
+			float DistanceToCharacter = (ACT->GetActorLocation() - Start).Size();
+			Start += CrosshairWorldDirection * (DistanceToCharacter + 15.f);
+			DrawDebugBox(GetWorld(), Start, FVector(5.f, 5.f, 5.f), FColor::Magenta);
+		}
 		FVector End = Start + CrosshairWorldDirection * TRACE_LENGTH;
 
 		GetWorld()->LineTraceSingleByChannel(TraceHit,Start,End,	ECollisionChannel::ECC_GameTraceChannel2);
 		if (!TraceHit.bBlockingHit)
 		{
 			TraceHit.ImpactPoint = End;
+		}
+		if (TraceHit.GetActor() && TraceHit.GetActor()->Implements<UCrossHairInterface>())
+		{
+			HUDPackage.CrossHairsColor = FLinearColor::Red;
+		}
+		else
+		{
+			HUDPackage.CrossHairsColor = FLinearColor::White;
 		}
 	}
 }
@@ -164,7 +177,7 @@ void UCombatComponent::SetHUDCrossHairs(float Deltatime)
 		ACTHUD = ACTHUD == nullptr ? Cast<AACTHUD>(ACTController->GetHUD()) : ACTHUD;
 		if (ACTHUD)
 		{
-			FHUDCollection HUDPackage;
+			
 			if (EquipedWeapon)
 			{
 				HUDPackage.CrossHairCenter = EquipedWeapon->CrossHairCenter;
@@ -199,9 +212,8 @@ void UCombatComponent::SetHUDCrossHairs(float Deltatime)
 			{
 				CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, Deltatime, 30.f);
 			}
-			if (bAiming)
+			if (bAiming && EquipedWeapon)
 			{
-
 				CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, -0.5f, Deltatime, EquipedWeapon->GetZoomInterpSpeed());
 			}
 			else
