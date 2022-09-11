@@ -10,11 +10,12 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "Camera/CameraComponent.h"
 #include "Take_Em_Down/PlayerController/ACTPlayerController.h"
 #include "Take_Em_Down/UI/ACTHUD.h"
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent() :bFireButtonPressed(false), bAiming(false),BaseWalkWalkSpeed(300),
-AimWalkWalkSpeed(250)
+AimWalkWalkSpeed(250), ZoomedFOV(30), ZoomInterpSpeed(20)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -31,20 +32,48 @@ void UCombatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	if (ACT)
+	{
+		ACT->GetCharacterMovement()->MaxWalkSpeed = BaseWalkWalkSpeed;
+
+		if (ACT->GetFollowCamera())
+		{
+			DefaultFOV = ACT->GetFollowCamera()->FieldOfView;
+			CurrentFOV = DefaultFOV;
+		}
+	}
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	SetHUDCrossHairs(DeltaTime);
 	if (ACT && ACT->IsLocallyControlled())
 	{
 		FHitResult HitResult;
 		TraceUnderCrossHairs(HitResult);
 		HitTarget = HitResult.ImpactPoint;
+		SetHUDCrossHairs(DeltaTime);
+		InterpFOV(DeltaTime);
 	}
 	// ...
+}
+
+void UCombatComponent::InterpFOV(float DeltaTime)
+{
+	if (EquipedWeapon == nullptr) return;
+
+	if (bAiming)
+	{
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, EquipedWeapon->GetZoomedFOV(), DeltaTime, EquipedWeapon->GetZoomInterpSpeed());
+	}
+	else
+	{
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, DefaultFOV, DeltaTime, ZoomInterpSpeed);
+	}
+	if (ACT && ACT->GetFollowCamera())
+	{
+		ACT->GetFollowCamera()->SetFieldOfView(CurrentFOV);
+	}
 }
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

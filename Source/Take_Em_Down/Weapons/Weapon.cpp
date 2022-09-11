@@ -12,7 +12,7 @@
 #include "Animation/AnimationAsset.h"
 #include "Engine/SkeletalMeshSocket.h"
 // Sets default values
-AWeapon::AWeapon()
+AWeapon::AWeapon():ZoomedFov(30), ZoomInterpSpeed(20)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;

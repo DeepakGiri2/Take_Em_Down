@@ -35,6 +35,7 @@ protected:
 		void Ser_Fire(const FVector_NetQuantize& HitLocation);
 	void TraceUnderCrossHairs(FHitResult& TraceHit);
 	void SetHUDCrossHairs(float Deltatime);
+	void InterpFOV(float DeltaTime);
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Details, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr <APlayerCharacter> ACT;
@@ -54,6 +55,22 @@ private:
 	float CrosshairInAirFactor;
 	//Aiming Hand Correction
 	FVector HitTarget;
+
+	/**
+	* Aiming and FOV
+	*/
+
+	// Field of view when not aiming; set to the camera's base FOV in BeginPlay
+	float DefaultFOV;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+		float ZoomedFOV;
+
+	float CurrentFOV;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+		float ZoomInterpSpeed;
+
 public:	
 	void EquipWeapon(TObjectPtr <AWeapon> WeaponToEquip);
 };

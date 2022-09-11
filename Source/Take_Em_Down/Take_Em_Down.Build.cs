@@ -8,7 +8,7 @@ public class Take_Em_Down : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HairStrandsCore", "MotionWarping","UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HairStrandsCore", "MotionWarping","UMG","OnlineSubsystem","OnlineSubsystemSteam"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

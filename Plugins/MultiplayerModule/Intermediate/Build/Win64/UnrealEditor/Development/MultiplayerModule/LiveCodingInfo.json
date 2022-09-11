@@ -2,9 +2,9 @@
 	"RemapUnityFiles": 
 	{
 		"Module.MultiplayerModule.cpp.obj": [
+			"MultiplayerMenu.cpp.obj",
 			"MultiplayerModule.cpp.obj",
-			"MultiplayerModuleSubsystem.cpp.obj",
-			"MultiplayerMenu.cpp.obj"
+			"MultiplayerModuleSubsystem.cpp.obj"
 		],
 		"Module.MultiplayerModule.gen.cpp.obj": [
 			"MultiplayerMenu.gen.cpp.obj",

@@ -125,6 +125,8 @@ public:
 
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurinngInPlace; }
 
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return Camera; }
+
 	TObjectPtr <AWeapon> GetEquipedWeapon();
 
 	/* Aim At Correct Direction */

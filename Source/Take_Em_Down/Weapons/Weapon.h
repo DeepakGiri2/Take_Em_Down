@@ -34,6 +34,13 @@ public:
 		TObjectPtr<UTexture2D> CrossHairTop;
 	UPROPERTY(EditAnywhere, Category = "CrossHair")
 		TObjectPtr<UTexture2D> CrossHairBottom;
+	/* Fov Zoom for Each Weapon 
+	*/
+	UPROPERTY(EditAnywhere, Category = "Aim")
+		float ZoomedFov;
+	UPROPERTY(EditAnywhere, Category = "Aim")
+		float ZoomInterpSpeed;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -70,4 +77,6 @@ public:
 	FORCEINLINE TObjectPtr<USphereComponent> GetAreaSphere() const { return AreaSphere; }
 	FORCEINLINE void SetAreaSphere(TObjectPtr<USphereComponent> InAreaSphere) { AreaSphere = InAreaSphere; }
 	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetWeaponMesh() const { return WeaponMesh; }
+	FORCEINLINE float GetZoomedFOV() const { return ZoomedFov; }
+	FORCEINLINE float GetZoomInterpSpeed() const { return ZoomInterpSpeed; }
 };
