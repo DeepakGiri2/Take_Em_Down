@@ -52,6 +52,8 @@ private:
 	float AimWalkWalkSpeed;
 	// Crosshair
 	float CrosshairVelocityFactor;
+	float CrosshairAimFactor;
+	float CrosshairFireFactor;
 	float CrosshairInAirFactor;
 	//Aiming Hand Correction
 	FVector HitTarget;
