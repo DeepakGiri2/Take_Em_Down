@@ -142,7 +142,7 @@ public:
 
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return Camera; }
 
-	FORCEINLINE bool GetIsServer() const { return HasAuthority(); }
+	FORCEINLINE bool GetIsServer() const { return !IsLocallyControlled(); }
 
 	TObjectPtr <AWeapon> GetEquipedWeapon();
 

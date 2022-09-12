@@ -33,11 +33,11 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	TurinngInPlace = ACT->GetTurningInPlace();
 	if (!ACT->GetIsServer())
 	{
-		GEngine->AddOnScreenDebugMessage(0, 0.2, FColor::Red, FString::Printf(TEXT("Bool: %s"), bIsEqupiedWeapon ? TEXT("true") : TEXT("false")));
+		GEngine->AddOnScreenDebugMessage(0, 0.2, FColor::Red, FString::Printf(TEXT("Bool: %s"), bAiming ? TEXT("true") : TEXT("false")));
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(1, 0.2, FColor::Blue, FString::Printf(TEXT("Bool: %s"), bIsEqupiedWeapon ? TEXT("true") : TEXT("false")));
+		GEngine->AddOnScreenDebugMessage(1, 0.2, FColor::Blue, FString::Printf(TEXT("Bool: %s"), bAiming ? TEXT("true") : TEXT("false")));
 	}
 
 	//YawOffset
