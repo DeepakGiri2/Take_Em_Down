@@ -46,69 +46,58 @@ void ABullet::BeginPlay()
 			EAttachLocation::KeepWorldPosition
 		);
 	}
-	if (HasAuthority())
-	{
+	//if (HasAuthority())
+	//{
 		BulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
-	}
+	//}
 	Debug.Add(this->GetActorLocation());
 }
 
 void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	ACT = OtherActor;
+	HitResult = Hit;
 	if (Hit.bBlockingHit)
 	{
-
-		if (GetVelocity().Size() < 200 && BullectProjectile)
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, Hit.Location, FRotator(0.f, 0.f, 0.f));
+		Debug.Add(Hit.Location);
+		if (P_FireParticle)
 		{
-			BulletMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			BulletMesh->SetSimulatePhysics(true);
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, HitResult.Location, FRotator(0.f, 0.f, 0.f));
 		}
-		else
+		DrawDebugSphere(GetWorld(), HitResult.Location, 5.f, 4, FColor::Blue, true);
+		if (ACT)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, Hit.Location, FRotator(0.f, 0.f, 0.f));
+			APlayerCharacter* LACT = Cast<APlayerCharacter>(ACT);
+			if (LACT)
+			{
+				LACT->PlayHitReactMontage();
+			}
 		}
+		Ser_SpawnEffects();
+		Destroy();
 	}
-	SpawnEffects(Hit);
-	Debug.Add(Hit.Location);
-	if (Debug.Num() > 1)
-	{
-		DrawDebugLine(GetWorld(), Debug[Debug.Num() - 2], Debug[Debug.Num() - 1], FColor::Blue,true);
-	}
-	DrawDebugSphere(GetWorld(), Hit.Location, 5.f, 4, FColor::Blue,true);
-	APlayerCharacter* ACT = Cast<APlayerCharacter>(OtherActor);
-	if (ACT)
-	{
-		ACT->PlayHitReactMontage();
-	}
-	
 }
 
-void ABullet::SpawnEffects_Implementation(const FHitResult& Hit)
+void ABullet::Ser_SpawnEffects_Implementation()
 {
-	if (Hit.bBlockingHit)
-	{
-	
-		if (GetVelocity().Size() < 5000)
-		{
-			if (PC_TracerComponent)
-			{
-				PC_TracerComponent->DestroyComponent();
-			}
-		}
-		else if (GetVelocity().Size() < 200 && BullectProjectile)
-		{
-			if (BullectProjectile)
-			{
-				BullectProjectile->Deactivate();
-				BullectProjectile->DestroyComponent();
-			}
-			BulletMesh->SetSimulatePhysics(true);
-		}
-		else
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, Hit.Location, FRotator(0.f, 0.f, 0.f));
-		}
+	Multi_SpawnEffects();
+}
 
+void ABullet::Multi_SpawnEffects_Implementation()
+{
+	if (P_FireParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, HitResult.Location, FRotator(0.f, 0.f, 0.f));
+	}
+	DrawDebugSphere(GetWorld(), HitResult.Location, 5.f, 4, FColor::Blue, true);
+	if (ACT)
+	{
+		APlayerCharacter* LACT = Cast<APlayerCharacter>(ACT);
+		if (LACT)
+		{
+			LACT->PlayHitReactMontage();
+		}
 	}
 }
 
@@ -117,5 +106,14 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ABullet::Destroyed()
+{
+	Super::Destroyed();
+	if (HitResult.bBlockingHit)
+	{
+		Ser_SpawnEffects();
+	}
 }
 

@@ -21,7 +21,9 @@ protected:
 	UFUNCTION()
 	virtual	void OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION(NetMulticast, Reliable)
-	virtual	void SpawnEffects(const FHitResult& Hit);
+	void Multi_SpawnEffects();
+	UFUNCTION(Server, Reliable)
+	void Ser_SpawnEffects();
 private:
 	UPROPERTY(EditAnywhere, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr <class UBoxComponent> BulletCollision;
@@ -34,10 +36,16 @@ private:
 	TObjectPtr<class UParticleSystemComponent> PC_TracerComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UProjectileMovementComponent> BullectProjectile;
+	UPROPERTY()
 	TArray < FVector > Debug;
+	UPROPERTY()
+	TObjectPtr <AActor> ACT;
+	UPROPERTY()
+	FHitResult HitResult;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void Destroyed() override;
 	FORCEINLINE TObjectPtr <UStaticMeshComponent> GetBulletMesh() const { return BulletMesh; };
 	FORCEINLINE void SetBulletMesh(TObjectPtr<UStaticMesh> InMesh) { BulletMesh->SetStaticMesh(InMesh); }
 };
