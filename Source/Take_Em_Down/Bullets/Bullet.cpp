@@ -10,6 +10,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Take_Em_Down/Character/PlayerCharacter.h"
+#include "Take_Em_Down/Character/BaseCharacter.h"
 
 
 // Sets default values
@@ -59,6 +60,13 @@ void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 	HitResult = Hit;
 	if (Hit.bBlockingHit)
 	{
+		ABaseCharacter* Charter = Cast<ABaseCharacter>(OtherActor);
+		if (Charter)
+		{
+			float Chicka = Charter->GetHealth() - 10;
+			Charter->SetHealth(Chicka);
+			GEngine->AddOnScreenDebugMessage(1, 5, FColor::Red, FString("Daii"));
+		}
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, Hit.Location, FRotator(0.f, 0.f, 0.f));
 		Debug.Add(Hit.Location);
 		if (P_FireParticle)

@@ -41,7 +41,8 @@ private:
 	/** MotionWarping Component **/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
-
+	UPROPERTY()
+		float Health;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -67,4 +68,7 @@ public:
 	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetLegs()const { return Legs; }
 	/** LODMANAGER **/
 	FORCEINLINE TObjectPtr <ULODSyncComponent> GetLODSYNC()const { return MetaLod; }
+	/*Char Stats*/
+	FORCEINLINE float GetHealth() const { return Health; }
+	FORCEINLINE void SetHealth(float InHelath) { Health = InHelath; }
 };
