@@ -75,6 +75,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = Combat)
 		float ZoomInterpSpeed;
 
+	UPROPERTY(EditAnywhere, Category = "Aim")
+		FVector DefaultSocketLocation;
+	UPROPERTY(EditAnywhere, Category = "Aim")
+		FVector CurrentSocketLocation;
+
 public:	
 	void EquipWeapon(TObjectPtr <AWeapon> WeaponToEquip);
+	FORCEINLINE bool GetAiming() { return bAiming; };
 };

@@ -105,7 +105,6 @@ private:
 	UPROPERTY(EditAnywhere)
 		float CameraThreshold;
 
-	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

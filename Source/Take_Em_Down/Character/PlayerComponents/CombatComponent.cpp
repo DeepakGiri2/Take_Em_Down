@@ -10,6 +10,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Take_Em_Down/PlayerController/ACTPlayerController.h"
 //#include "Take_Em_Down/UI/ACTHUD.h"
@@ -40,6 +41,7 @@ void UCombatComponent::BeginPlay()
 		{
 			DefaultFOV = ACT->GetFollowCamera()->FieldOfView;
 			CurrentFOV = DefaultFOV;
+			DefaultSocketLocation = ACT->GetCameraBoom()->SocketOffset;
 		}
 	}
 }
@@ -49,6 +51,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (ACT && ACT->IsLocallyControlled())
 	{
+		if (!EquipedWeapon) return;
 		FHitResult HitResult;
 		TraceUnderCrossHairs(HitResult);
 		HitTarget = HitResult.ImpactPoint;
@@ -65,14 +68,17 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 	if (bAiming)
 	{
 		CurrentFOV = FMath::FInterpTo(CurrentFOV, EquipedWeapon->GetZoomedFOV(), DeltaTime, EquipedWeapon->GetZoomInterpSpeed());
+		CurrentSocketLocation = FMath::VInterpTo(CurrentSocketLocation, EquipedWeapon->AimSocketLocation, DeltaTime, EquipedWeapon->GetZoomInterpSpeed());
 	}
 	else
 	{
 		CurrentFOV = FMath::FInterpTo(CurrentFOV, DefaultFOV, DeltaTime, ZoomInterpSpeed);
+		CurrentSocketLocation = FMath::VInterpTo(CurrentSocketLocation, DefaultSocketLocation, DeltaTime, ZoomInterpSpeed);
 	}
 	if (ACT && ACT->GetFollowCamera())
 	{
 		ACT->GetFollowCamera()->SetFieldOfView(CurrentFOV);
+		ACT->GetCameraBoom()->SocketOffset = CurrentSocketLocation;
 	}
 }
 

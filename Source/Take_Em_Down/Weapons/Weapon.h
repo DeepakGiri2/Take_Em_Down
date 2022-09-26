@@ -40,6 +40,9 @@ public:
 		float ZoomedFov;
 	UPROPERTY(EditAnywhere, Category = "Aim")
 		float ZoomInterpSpeed;
+	// Camera
+	UPROPERTY(EditAnywhere, Category = "Aim")
+	FVector AimSocketLocation;
 
 protected:
 	// Called when the game starts or when spawned

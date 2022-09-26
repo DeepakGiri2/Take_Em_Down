@@ -16,6 +16,7 @@
 // Sets default values
 APlayerCharacter::APlayerCharacter() :MouseAimLookUpRate(0.2f), MouseHipTurnRate(1.0f),bIsSprinting(false),
 MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f),TurinngInPlace(ETurningInPlace::ETIP_NotTuring), CameraThreshold(100.f)
+
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -92,7 +93,6 @@ void APlayerCharacter::HideCharacterWhileOverlapping()
 		}
 	}
 }
-
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
@@ -276,7 +276,6 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 		FVector2D OutRange(-90.f, 0.f);
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange,AO_Pitch);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Pitch %f"), AO_Pitch);
 }
 
 void APlayerCharacter::TurnInPlace(float DeltaTime)
