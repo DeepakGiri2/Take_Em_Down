@@ -384,6 +384,12 @@ bool APlayerCharacter::IsAiming()
 	return (CombatComponent && CombatComponent->bAiming);
 }
 
+void APlayerCharacter::ITakeDamage(FHitResult InHit)
+{
+	float Chicka = GetHealth() - 10;
+	SetHealth(Chicka);
+}
+
 TObjectPtr<AWeapon> APlayerCharacter::GetEquipedWeapon()
 {
 	if (!CombatComponent) return nullptr;

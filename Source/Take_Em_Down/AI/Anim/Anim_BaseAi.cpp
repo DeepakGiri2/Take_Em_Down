@@ -31,4 +31,13 @@ void UAnim_BaseAi::NativeUpdateAnimation(float DeltaTime)
 	bIsCrouched = ACT->bIsCrouched;
 	bAiming = ACT->IsAiming();
 	TurinngInPlace = ACT->GetTurningInPlace();
+	if (bIsEqupiedWeapon && EquipedWeapon && EquipedWeapon->GetWeaponMesh())
+	{
+		LeftHandTransform = EquipedWeapon->GetWeaponMesh()->GetSocketTransform(FName("AILHS"), ERelativeTransformSpace::RTS_World);
+		FVector OutLoc;
+		FRotator OutRot;
+		ACT->GetMesh()->TransformToBoneSpace(FName("hand_r"), LeftHandTransform.GetLocation(), LeftHandTransform.GetRotation().Rotator(), OutLoc, OutRot);
+		LeftHandTransform.SetLocation(OutLoc);
+		LeftHandTransform.SetRotation(FQuat(OutRot));
+	}
 }

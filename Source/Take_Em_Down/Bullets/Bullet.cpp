@@ -11,6 +11,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Take_Em_Down/Character/PlayerCharacter.h"
 #include "Take_Em_Down/Character/BaseCharacter.h"
+#include "Take_Em_Down/Interface/CrossHairInterface.h"
 
 
 // Sets default values
@@ -60,30 +61,30 @@ void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 	HitResult = Hit;
 	if (Hit.bBlockingHit)
 	{
-		ABaseCharacter* Charter = Cast<ABaseCharacter>(OtherActor);
-		if (Charter)
+		ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(OtherActor);
+		if (OtherActor && HitActor)
 		{
-			float Chicka = Charter->GetHealth() - 10;
-			Charter->SetHealth(Chicka);
-			GEngine->AddOnScreenDebugMessage(1, 5, FColor::Red, FString("Daii"));
+			HitActor->ITakeDamage(Hit);
 		}
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, Hit.Location, FRotator(0.f, 0.f, 0.f));
-		Debug.Add(Hit.Location);
-		if (P_FireParticle)
+		else
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, HitResult.Location, FRotator(0.f, 0.f, 0.f));
-		}
-		DrawDebugSphere(GetWorld(), HitResult.Location, 5.f, 4, FColor::Blue, true);
-		if (ACT)
-		{
-			APlayerCharacter* LACT = Cast<APlayerCharacter>(ACT);
-			if (LACT)
+			if (P_FireParticle)
 			{
-				LACT->PlayHitReactMontage();
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, HitResult.Location, FRotator(0.f, 0.f, 0.f));
 			}
+			DrawDebugSphere(GetWorld(), HitResult.Location, 5.f, 4, FColor::Blue, true);
+			if (ACT)
+			{
+				APlayerCharacter* LACT = Cast<APlayerCharacter>(ACT);
+				if (LACT)
+				{
+					LACT->PlayHitReactMontage();
+				}
+			}
+			Ser_SpawnEffects();
+			Destroy();
 		}
-		Ser_SpawnEffects();
-		Destroy();
+		
 	}
 }
 

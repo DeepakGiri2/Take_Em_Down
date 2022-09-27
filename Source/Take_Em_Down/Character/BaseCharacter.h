@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Take_Em_Down/Interface/CrossHairInterface.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()
-class TAKE_EM_DOWN_API ABaseCharacter : public ACharacter
+class TAKE_EM_DOWN_API ABaseCharacter : public ACharacter, public ICrossHairInterface
 {
 	GENERATED_BODY()
 
@@ -41,8 +42,10 @@ private:
 	/** MotionWarping Component **/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
-	UPROPERTY()
-		float Health;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStats, meta = (AllowPrivateAccess = "true"))
+		float Health = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStats, meta = (AllowPrivateAccess = "true"))
+		float MaxHealth = 100.f;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -70,5 +73,7 @@ public:
 	FORCEINLINE TObjectPtr <ULODSyncComponent> GetLODSYNC()const { return MetaLod; }
 	/*Char Stats*/
 	FORCEINLINE float GetHealth() const { return Health; }
-	FORCEINLINE void SetHealth(float InHelath) { Health = InHelath; }
+	void SetHealth(float InHelath);
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+	FORCEINLINE void SetMaxHealth(float InHelath) { MaxHealth = InHelath; }
 };

@@ -32,6 +32,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = Weapons, meta = (AllowPrivateAccess = "true"))
 		bool bIsEqupiedWeapon;
+	UPROPERTY(BlueprintReadOnly, Category = Weapons, meta = (AllowPrivateAccess = "true"))
+		FTransform LeftHandTransform;
 
 	UPROPERTY()
 		TObjectPtr <class AWeapon> EquipedWeapon;

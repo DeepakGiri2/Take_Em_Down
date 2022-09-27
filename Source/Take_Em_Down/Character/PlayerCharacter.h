@@ -5,14 +5,13 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "Take_Em_Down/playerStates/TurnInPlace.h"
-#include "Take_Em_Down/Interface/CrossHairInterface.h"
 #include "PlayerCharacter.generated.h"
 
 /**
  *
  */
 UCLASS()
-class TAKE_EM_DOWN_API APlayerCharacter : public ABaseCharacter, public ICrossHairInterface
+class TAKE_EM_DOWN_API APlayerCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 public:
@@ -126,6 +125,10 @@ public:
 	bool IsWeaponEquiped();
 
 	bool IsAiming();
+
+	// CrossHair Interface Implemetation 
+
+	virtual void ITakeDamage(FHitResult InHit) override;
 
 	FORCEINLINE TObjectPtr<USpringArmComponent> GetCameraBoom() const { return CameraBoom; }
 

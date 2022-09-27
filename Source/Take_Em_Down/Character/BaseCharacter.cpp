@@ -143,3 +143,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ABaseCharacter::SetHealth(float InHelath)
+{
+	Health = FMath::Clamp(InHelath, 0, MaxHealth);
+}
+

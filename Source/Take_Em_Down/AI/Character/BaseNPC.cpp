@@ -5,6 +5,8 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Take_Em_Down/Weapons/Weapon.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 bool ABaseNPC::IsWeaponEquiped()
 {
 	if (EquipedWeapon)
@@ -17,6 +19,21 @@ bool ABaseNPC::IsWeaponEquiped()
 bool ABaseNPC::IsAiming()
 {
 	return false;
+}
+
+void ABaseNPC::ITakeDamage(FHitResult InHit)
+{
+	if (P_BloodParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_BloodParticle, InHit.Location, FRotator(0.f, 0.f, 0.f));
+	}
+	float TempHelath = GetHealth() - 25;
+	SetHealth(TempHelath);
+	if (GetHealth() <= 0)
+	{
+		UnPossessed();
+		GetMesh()->SetSimulatePhysics(true);
+	}
 }
 
 ETurningInPlace ABaseNPC::GetTurningInPlace()
@@ -40,7 +57,7 @@ void ABaseNPC::EquipeWeapon(TObjectPtr<class AWeapon> WeaponToEquip)
 	if (!WeaponToEquip) return;
 	EquipedWeapon = WeaponToEquip;
 	EquipedWeapon->SetWeaponState(EWeaponState::EWS_Equiped);
-	const USkeletalMeshSocket* RightHandSocket = GetMesh()->GetSocketByName(FName("RightHandSocket"));
+	const USkeletalMeshSocket* RightHandSocket = GetMesh()->GetSocketByName(FName("AI_RHS"));
 	if (RightHandSocket)
 	{
 		RightHandSocket->AttachActor(EquipedWeapon, GetMesh());

@@ -4,3 +4,7 @@
 #include "CrossHairInterface.h"
 
 // Add default functionality here for any ICrossHairInterface functions that are not pure virtual.
+
+void ICrossHairInterface::ITakeDamage(FHitResult InResult)
+{
+}

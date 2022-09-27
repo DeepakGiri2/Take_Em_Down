@@ -17,10 +17,13 @@ class TAKE_EM_DOWN_API ABaseNPC : public ABaseCharacter
 public:
 	bool IsWeaponEquiped();
 	bool IsAiming();
+	virtual void ITakeDamage(FHitResult InHit) override;
 	ETurningInPlace GetTurningInPlace();
 	ABaseNPC();
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AWeapon> ActWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UParticleSystem> P_BloodParticle;
 protected:
 	virtual void BeginPlay() override;
 public:
