@@ -13,14 +13,14 @@ ABulletShells::ABulletShells()
 	BulletShellMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	BulletShellMesh->SetSimulatePhysics(true);
 	BulletShellMesh->SetEnableGravity(true);
-
 }
 
 // Called when the game starts or when spawned
 void ABulletShells::BeginPlay()
 {
 	Super::BeginPlay();
-	BulletShellMesh->AddImpulse(GetActorForwardVector() * 10.f);
+	BulletShellMesh->AddImpulse(GetActorForwardVector() * 5.f);
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ThisClass::DestroyThis, 5);
 }
 
 // Called every frame
@@ -28,5 +28,10 @@ void ABulletShells::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ABulletShells::DestroyThis()
+{
+	Destroy();
 }
 

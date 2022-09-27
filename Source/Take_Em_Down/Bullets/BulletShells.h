@@ -21,8 +21,9 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr <UStaticMeshComponent> BulletShellMesh;
+	FTimerHandle DestroyTimer;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	void DestroyThis();
 };

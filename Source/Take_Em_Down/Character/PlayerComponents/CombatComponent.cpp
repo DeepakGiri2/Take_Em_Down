@@ -13,10 +13,13 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Take_Em_Down/PlayerController/ACTPlayerController.h"
-//#include "Take_Em_Down/UI/ACTHUD.h"
+#include "TimerManager.h"
+
+
 // Sets default values for this component's properties
-UCombatComponent::UCombatComponent() :bFireButtonPressed(false), bAiming(false),BaseWalkWalkSpeed(300),
-AimWalkWalkSpeed(250), ZoomedFOV(30), ZoomInterpSpeed(20),CrosshairAimFactor(0.f),CrosshairFireFactor(0.f)
+UCombatComponent::UCombatComponent() :bFireButtonPressed(false), bAiming(false), BaseWalkWalkSpeed(300),
+AimWalkWalkSpeed(250), ZoomedFOV(30), ZoomInterpSpeed(20), CrosshairAimFactor(0.f), CrosshairFireFactor(0.f),
+bCanFire(true)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -124,13 +127,21 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	bFireButtonPressed = bPressed;
 	if (bFireButtonPressed)
 	{
-		FHitResult Hit;
-		TraceUnderCrossHairs(Hit);
-		Ser_Fire(Hit.ImpactPoint);
+		Fire();
+	}
+}
+
+void UCombatComponent::Fire()
+{
+	if (bCanFire)
+	{
+		bCanFire = false;
+		Ser_Fire(HitTarget);
 		if (EquipedWeapon)
 		{
 			CrosshairFireFactor = 0.95f;
 		}
+		StartFireTimer();
 	}
 }
 
@@ -248,6 +259,22 @@ void UCombatComponent::Multi_Fire_Implementation(const FVector_NetQuantize& HitL
 void UCombatComponent::Ser_Fire_Implementation(const FVector_NetQuantize& HitLocation)
 {
 	Multi_Fire(HitLocation);
+}
+
+void UCombatComponent::StartFireTimer()
+{
+	if (!EquipedWeapon || !ACT) return;
+	ACT->GetWorldTimerManager().SetTimer(FireTimer, this, &UCombatComponent::FireTimerCompleted, EquipedWeapon->FireDelay);
+
+}
+
+void UCombatComponent::FireTimerCompleted()
+{
+	bCanFire = true;
+	if (bFireButtonPressed && EquipedWeapon->bAutomatic)
+	{
+		Fire();
+	}
 }
 
 void UCombatComponent::EquipWeapon(TObjectPtr<AWeapon> WeaponToEquip)

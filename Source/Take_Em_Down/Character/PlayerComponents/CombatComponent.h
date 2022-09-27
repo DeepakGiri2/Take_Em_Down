@@ -30,6 +30,7 @@ protected:
 	UFUNCTION()
 		void OnRep_EquipedWeapon();
 	void FireButtonPressed(bool bPressed);
+	void Fire();
 	UFUNCTION(NetMulticast, Reliable)
 		void Multi_Fire(const FVector_NetQuantize& HitLocation);
 	UFUNCTION(Server, Reliable)
@@ -79,7 +80,14 @@ private:
 		FVector DefaultSocketLocation;
 	UPROPERTY(EditAnywhere, Category = "Aim")
 		FVector CurrentSocketLocation;
+	/*
+	* Automatic Fire
+	*/
 
+	FTimerHandle FireTimer;
+	bool bCanFire;
+	void StartFireTimer();
+	void FireTimerCompleted();
 public:	
 	void EquipWeapon(TObjectPtr <AWeapon> WeaponToEquip);
 	FORCEINLINE bool GetAiming() { return bAiming; };

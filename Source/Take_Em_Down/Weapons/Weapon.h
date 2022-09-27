@@ -43,7 +43,13 @@ public:
 	// Camera
 	UPROPERTY(EditAnywhere, Category = "Aim")
 	FVector AimSocketLocation;
-
+	/*
+	* AutomaticFunction
+	*/
+	UPROPERTY(EditAnywhere, Category = "Fire")
+		float FireDelay;
+	UPROPERTY(EditAnywhere, Category = "Fire")
+		bool bAutomatic;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
