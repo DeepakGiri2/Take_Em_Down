@@ -384,10 +384,17 @@ bool APlayerCharacter::IsAiming()
 	return (CombatComponent && CombatComponent->bAiming);
 }
 
-void APlayerCharacter::ITakeDamage(FHitResult InHit)
+void APlayerCharacter::ITakeDamage(FHitResult InHit,FRotator InRotation)
 {
 	float Chicka = GetHealth() - 10;
 	SetHealth(Chicka);
+	if (P_BloodParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_BloodParticle, InHit.Location, InRotation);
+	}
+	if (GetHealth() <= 0)
+	{
+	}
 }
 
 TObjectPtr<AWeapon> APlayerCharacter::GetEquipedWeapon()

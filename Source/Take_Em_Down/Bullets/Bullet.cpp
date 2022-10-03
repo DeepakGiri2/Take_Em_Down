@@ -64,7 +64,7 @@ void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 		ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(OtherActor);
 		if (OtherActor && HitActor)
 		{
-			HitActor->ITakeDamage(Hit);
+			HitActor->ITakeDamage(Hit,FRotator(90,0,0));
 		}
 		else
 		{

@@ -104,6 +104,9 @@ private:
 	UPROPERTY(EditAnywhere)
 		float CameraThreshold;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<class UParticleSystem> P_BloodParticle;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -128,7 +131,7 @@ public:
 
 	// CrossHair Interface Implemetation 
 
-	virtual void ITakeDamage(FHitResult InHit) override;
+	virtual void ITakeDamage(FHitResult InHit,FRotator InRotation = FRotator(0.f, 0.f, 0.f)) override;
 
 	FORCEINLINE TObjectPtr<USpringArmComponent> GetCameraBoom() const { return CameraBoom; }
 

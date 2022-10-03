@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "Take_Em_Down/AI/Components/AICombatComponent.h"
 bool ABaseNPC::IsWeaponEquiped()
 {
 	if (EquipedWeapon)
@@ -21,18 +22,20 @@ bool ABaseNPC::IsAiming()
 	return false;
 }
 
-void ABaseNPC::ITakeDamage(FHitResult InHit)
+void ABaseNPC::PlayFireMontage(bool bInAiming)
+{
+}
+
+void ABaseNPC::ITakeDamage(FHitResult InHit ,FRotator InRotation)
 {
 	if (P_BloodParticle)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_BloodParticle, InHit.Location, FRotator(0.f, 0.f, 0.f));
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_BloodParticle, InHit.Location, InRotation);
 	}
 	float TempHelath = GetHealth() - 25;
 	SetHealth(TempHelath);
 	if (GetHealth() <= 0)
 	{
-		UnPossessed();
-		GetMesh()->SetSimulatePhysics(true);
 	}
 }
 
@@ -43,7 +46,7 @@ ETurningInPlace ABaseNPC::GetTurningInPlace()
 
 ABaseNPC::ABaseNPC()
 {
-
+	CombatComponent = CreateDefaultSubobject<UAICombatComponent>("AiCombat");
 }
 
 void ABaseNPC::BeginPlay()
@@ -52,23 +55,11 @@ void ABaseNPC::BeginPlay()
 	SpawnWeapon();
 }
 
-void ABaseNPC::EquipeWeapon(TObjectPtr<class AWeapon> WeaponToEquip)
-{
-	if (!WeaponToEquip) return;
-	EquipedWeapon = WeaponToEquip;
-	EquipedWeapon->SetWeaponState(EWeaponState::EWS_Equiped);
-	const USkeletalMeshSocket* RightHandSocket = GetMesh()->GetSocketByName(FName("AI_RHS"));
-	if (RightHandSocket)
-	{
-		RightHandSocket->AttachActor(EquipedWeapon, GetMesh());
-	}
-	EquipedWeapon->SetOwner(this);
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	bUseControllerRotationYaw = true;
-}
-
 void ABaseNPC::SpawnWeapon()
 {
 	AWeapon* TempWeapon = GetWorld()->SpawnActor<AWeapon>(ActWeapon);
-	EquipeWeapon(TempWeapon);
+	if (CombatComponent)
+	{
+		CombatComponent->EquipWeapon(TempWeapon);
+	}
 }

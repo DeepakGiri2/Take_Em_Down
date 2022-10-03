@@ -15,11 +15,12 @@ class TAKE_EM_DOWN_API ABaseNPC : public ABaseCharacter
 {
 	GENERATED_BODY()
 public:
+	ABaseNPC();
 	bool IsWeaponEquiped();
 	bool IsAiming();
-	virtual void ITakeDamage(FHitResult InHit) override;
+	void PlayFireMontage(bool bInAiming);
+	virtual void ITakeDamage(FHitResult InHit, FRotator InRotation = FRotator(0.f, 0.f, 0.f)) override;
 	ETurningInPlace GetTurningInPlace();
-	ABaseNPC();
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AWeapon> ActWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
@@ -28,8 +29,9 @@ protected:
 	virtual void BeginPlay() override;
 public:
 	bool bIsCrouched;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Comps, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAICombatComponent> CombatComponent;
 private:
-	void EquipeWeapon(TObjectPtr<AWeapon> WeaponToEquip);
 	void SpawnWeapon();
 private:
 	TObjectPtr<AWeapon> EquipedWeapon;
