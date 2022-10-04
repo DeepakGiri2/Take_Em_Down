@@ -10,7 +10,7 @@
 #include "Take_Em_Down/AI/Components/AICombatComponent.h"
 bool ABaseNPC::IsWeaponEquiped()
 {
-	if (EquipedWeapon)
+	if (CombatComponent->GetEquipedWeapon())
 	{
 		return true;
 	}
@@ -19,11 +19,24 @@ bool ABaseNPC::IsWeaponEquiped()
 
 bool ABaseNPC::IsAiming()
 {
+	if (CombatComponent->GetAiming())
+	{
+		return true;
+	}
 	return false;
 }
 
 void ABaseNPC::PlayFireMontage(bool bInAiming)
 {
+	if (!CombatComponent || !CombatComponent->GetEquipedWeapon()) return;
+	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
+	if (AnimIns && FireWeaponMontage)
+	{
+		AnimIns->Montage_Play(FireWeaponMontage);
+		FName SectionName;
+		SectionName = bInAiming ? FName("Rifle_Aim") : FName("Rifle_Hip");
+		AnimIns->Montage_JumpToSection(SectionName);
+	}
 }
 
 void ABaseNPC::ITakeDamage(FHitResult InHit ,FRotator InRotation)
@@ -36,6 +49,7 @@ void ABaseNPC::ITakeDamage(FHitResult InHit ,FRotator InRotation)
 	SetHealth(TempHelath);
 	if (GetHealth() <= 0)
 	{
+		CombatComponent->DetachWeapon();
 	}
 }
 
@@ -47,6 +61,10 @@ ETurningInPlace ABaseNPC::GetTurningInPlace()
 ABaseNPC::ABaseNPC()
 {
 	CombatComponent = CreateDefaultSubobject<UAICombatComponent>("AiCombat");
+	CombatComponent->ACT = this;
+	CombatComponent->SetIsReplicated(true);
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
 }
 
 void ABaseNPC::BeginPlay()
@@ -58,7 +76,7 @@ void ABaseNPC::BeginPlay()
 void ABaseNPC::SpawnWeapon()
 {
 	AWeapon* TempWeapon = GetWorld()->SpawnActor<AWeapon>(ActWeapon);
-	if (CombatComponent)
+	if (CombatComponent && TempWeapon)
 	{
 		CombatComponent->EquipWeapon(TempWeapon);
 	}

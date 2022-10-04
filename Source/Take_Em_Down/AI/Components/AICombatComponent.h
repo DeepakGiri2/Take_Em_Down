@@ -33,6 +33,7 @@ public:
 	UFUNCTION(Server, Reliable)
 		void Ser_Fire(const FVector_NetQuantize& HitLocation);
 	void TraceFormSocketLocation(FHitResult& HitResult);
+	void DetachWeapon();
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_EquipedWeapon)
 		TObjectPtr<class AWeapon> EquipedWeapon;
@@ -57,8 +58,10 @@ private:
 	bool bCanFire;
 	void StartFireTimer();
 	void FireTimerCompleted();
+public:
 	TObjectPtr<class ABaseNPC> ACT;
 public:
 	void EquipWeapon(TObjectPtr <AWeapon> WeaponToEquip);
 	FORCEINLINE bool GetAiming() { return bAiming; };
+	FORCEINLINE TObjectPtr<AWeapon> GetEquipedWeapon() const {return EquipedWeapon;}
 };

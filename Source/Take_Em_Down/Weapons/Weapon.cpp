@@ -70,6 +70,7 @@ void AWeapon::ShowPickUpWidget(bool InVisibility)
 
 void AWeapon::Fire(const FVector& HitLocation)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Shit"));
 	if (FireAnimation)
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
@@ -115,10 +116,15 @@ void AWeapon::SetWeaponState(EWeaponState InWeaponState)
 	{
 	case EWeaponState::EWS_Equiped:
 		ShowPickUpWidget(false);
+		WeaponMesh->SetSimulatePhysics(false);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
 	case EWeaponState::EWS_Droped:
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->ComponentVelocity = FVector(0.f, 0.f, 0.f);
 		break;
 	case EWeaponState::EWS_Fresh:
 		break;

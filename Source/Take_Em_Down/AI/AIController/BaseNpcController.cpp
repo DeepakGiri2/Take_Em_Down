@@ -4,6 +4,9 @@
 #include "BaseNpcController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "Kismet/GameplayStatics.h"
+#include "Take_Em_Down/Character/PlayerCharacter.h"
+#include "Perception/AIPerceptionTypes.h" 
 ABaseNpcController::ABaseNpcController():AISightRadius(500.f), AISightAge(5.0f),
 AILooseSightRadius(AISightRadius + 50.f), AIFOV(145.f)
 {
@@ -20,20 +23,13 @@ AILooseSightRadius(AISightRadius + 50.f), AIFOV(145.f)
 
 	GetPerceptionComponent()->SetDominantSense(*SightConfig->GetSenseImplementation());
 	GetPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPawnDetected);
+	GetPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetUpdate);
 	GetPerceptionComponent()->ConfigureSense(*SightConfig);
 }
 
 void ABaseNpcController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (!GetPerceptionComponent())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Shit"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("StartMusic"));
-	}
 }
 
 void ABaseNpcController::Tick(float DeltaTime)
@@ -44,7 +40,17 @@ void ABaseNpcController::Tick(float DeltaTime)
 void ABaseNpcController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	UE_LOG(LogTemp, Warning, TEXT("Possessed"));
+	TArray<AActor*> OutActor;
+	UGameplayStatics::GetAllActorsOfClass(this, GitClass, OutActor);
+	for (AActor* A : OutActor)
+	{
+		ACT = Cast<APlayerCharacter>(A);
+		if (ACT && ACT->IsLocallyControlled())
+		{
+			return;
+		}
+	}
+	
 }
 
 FRotator ABaseNpcController::GetControlRotation() const
@@ -57,5 +63,17 @@ FRotator ABaseNpcController::GetControlRotation() const
 }
 
 void ABaseNpcController::OnPawnDetected(const TArray<AActor*>& UpdatedActors)
+{
+}
+
+void ABaseNpcController::OnTargetUpdate(AActor* Actor, FAIStimulus Stimulus)
+{
+	if (Stimulus.WasSuccessfullySensed() && Actor == ACT)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hello my name is "));
+	}
+}
+
+void ABaseNpcController::FocusTargetActor()
 {
 }

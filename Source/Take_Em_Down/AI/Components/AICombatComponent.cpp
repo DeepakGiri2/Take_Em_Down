@@ -13,7 +13,7 @@
 #include "Take_Em_Down/AI/Character/BaseNPC.h"
 
 // Sets default values for this component's properties
-UAICombatComponent::UAICombatComponent()
+UAICombatComponent::UAICombatComponent():bCanFire(true)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -47,13 +47,6 @@ void UAICombatComponent::SetAiming(bool bIsAiming)
 void UAICombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (ACT && ACT->IsLocallyControlled())
-	{
-		if (!EquipedWeapon) return;
-		FHitResult HitResult;
-		TraceFormSocketLocation(HitResult);
-		HitTarget = HitResult.ImpactPoint;
-	}
 	// ...
 }
 
@@ -73,10 +66,12 @@ void UAICombatComponent::StartFireTimer()
 void UAICombatComponent::FireTimerCompleted()
 {
 	bCanFire = true;
+	if (!EquipedWeapon) return;
 	if (bFireButtonPressed && EquipedWeapon->bAutomatic)
 	{
 		Fire();
 	}
+	
 }
 
 void UAICombatComponent::EquipWeapon(TObjectPtr<AWeapon> WeaponToEquip)
@@ -126,6 +121,9 @@ void UAICombatComponent::Fire()
 	if (bCanFire)
 	{
 		bCanFire = false;
+		FHitResult HitResult;
+		TraceFormSocketLocation(HitResult);
+		HitTarget = HitResult.ImpactPoint;
 		Ser_Fire(HitTarget);
 		StartFireTimer();
 	}
@@ -136,17 +134,25 @@ void UAICombatComponent::TraceFormSocketLocation(FHitResult& HitResult)
 	if (EquipedWeapon)
 	{
 		FVector Start = EquipedWeapon->GetWeaponMesh()->GetSocketLocation(FName("MuzzleFlash"));
-		FVector End = Start + EquipedWeapon->GetWeaponMesh()->GetForwardVector() * 80000;
-
+		FVector End = Start + EquipedWeapon->GetWeaponMesh()->GetRightVector() * 80000;
 		GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_GameTraceChannel2);
 		if (!HitResult.bBlockingHit)
 		{
 			HitResult.ImpactPoint = End;
 		}
-
-
 	}
 
+}
+
+void UAICombatComponent::DetachWeapon()
+{
+	if (!EquipedWeapon) return;
+	const FDetachmentTransformRules DetachRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, true);
+	EquipedWeapon->DetachFromActor(DetachRules);
+	EquipedWeapon->SetWeaponState(EWeaponState::EWS_Droped);
+	EquipedWeapon = nullptr;
+	ACT->GetCharacterMovement()->bOrientRotationToMovement = true;
+	ACT->bUseControllerRotationYaw = false;
 }
 
 void UAICombatComponent::Multi_Fire_Implementation(const FVector_NetQuantize& HitLocation)

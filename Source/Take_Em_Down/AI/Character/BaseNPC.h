@@ -31,6 +31,8 @@ public:
 	bool bIsCrouched;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Comps, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAICombatComponent> CombatComponent;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TObjectPtr<class UAnimMontage> FireWeaponMontage;
 private:
 	void SpawnWeapon();
 private:

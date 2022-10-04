@@ -10,7 +10,6 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Take_Em_Down/Character/PlayerCharacter.h"
-#include "Take_Em_Down/Character/BaseCharacter.h"
 #include "Take_Em_Down/Interface/CrossHairInterface.h"
 
 
