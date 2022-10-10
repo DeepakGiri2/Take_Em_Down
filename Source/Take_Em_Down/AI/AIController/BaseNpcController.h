@@ -5,13 +5,15 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "Take_Em_Down/AI/Interfaces/AIInterface.h"
+#include "Perception/AIPerceptionTypes.h" 
 #include "BaseNpcController.generated.h"
 
 /**
  * 
  */
+
 UCLASS()
-class TAKE_EM_DOWN_API ABaseNpcController : public AAIController, public IAIInterface
+class TAKE_EM_DOWN_API ABaseNpcController : public AAIController , public IAIInterface
 {
 	GENERATED_BODY()
 protected:
@@ -26,7 +28,7 @@ public:
 	UFUNCTION()
 		void OnPawnDetected(const TArray<AActor*>& UpdatedActors);
 	UFUNCTION()
-		void OnTargetUpdate(AActor* Actor, struct FAIStimulus Stimulus);
+		void OnTargetUpdate(AActor* Actor, FAIStimulus Stimulus);
 	UPROPERTY(BlueprintReadWrite, Category = Properites, meta = (AllowPrivateAccess = "true"))
 		float AISightRadius;
 	UPROPERTY(BlueprintReadWrite, Category = Properites, meta = (AllowPrivateAccess = "true"))
@@ -41,6 +43,5 @@ public:
 		TObjectPtr<class APlayerCharacter> ACT;
 	UPROPERTY(BlueprintReadWrite, Category = Variables, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AActor> GitClass;
-	UFUNCTION(BlueprintCallable)
-	virtual void FocusTargetActor() override;
+
 };

@@ -6,7 +6,8 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Kismet/GameplayStatics.h"
 #include "Take_Em_Down/Character/PlayerCharacter.h"
-#include "Perception/AIPerceptionTypes.h" 
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 ABaseNpcController::ABaseNpcController():AISightRadius(500.f), AISightAge(5.0f),
 AILooseSightRadius(AISightRadius + 50.f), AIFOV(145.f)
 {
@@ -74,6 +75,4 @@ void ABaseNpcController::OnTargetUpdate(AActor* Actor, FAIStimulus Stimulus)
 	}
 }
 
-void ABaseNpcController::FocusTargetActor()
-{
-}
+

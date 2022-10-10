@@ -5,6 +5,3 @@
 
 // Add default functionality here for any IAIInterface functions that are not pure virtual.
 
-void IAIInterface::FocusTargetActor()
-{
-}
