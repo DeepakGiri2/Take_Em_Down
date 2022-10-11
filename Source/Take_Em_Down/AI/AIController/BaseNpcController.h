@@ -12,7 +12,7 @@
  * 
  */
 
-UCLASS()
+UCLASS(Blueprintable)
 class TAKE_EM_DOWN_API ABaseNpcController : public AAIController , public IAIInterface
 {
 	GENERATED_BODY()
@@ -24,13 +24,16 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual FRotator GetControlRotation() const override;
+	virtual APawn* GetPlayerPawn() const override;
+	virtual FVector GetPlayerLocation() const override;
+	virtual class UBlackboardComponent* GetBlackboardComponent() const override;
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Comps, meta = (AllowPrivateAccess = "true"))
 	class UBehaviorTreeComponent* m_BTComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Comps, meta = (AllowPrivateAccess = "true"))
 	class UBehaviorTree* m_BT_Asset;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Comps, meta = (AllowPrivateAccess = "true"))
-		class UBlackboardComponent* m_BB_Comp;
+	UBlackboardComponent* m_BB_Comp;
 public:
 	UFUNCTION()
 		void OnPawnDetected(const TArray<AActor*>& UpdatedActors);

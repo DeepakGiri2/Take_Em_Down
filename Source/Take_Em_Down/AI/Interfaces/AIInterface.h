@@ -22,5 +22,7 @@ class TAKE_EM_DOWN_API IAIInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	
+	virtual APawn* GetPlayerPawn() const = 0;
+	virtual FVector GetPlayerLocation() const = 0;
+	virtual class UBlackboardComponent* GetBlackboardComponent() const = 0;
 };

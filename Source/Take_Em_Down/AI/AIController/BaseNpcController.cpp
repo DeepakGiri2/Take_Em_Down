@@ -8,11 +8,18 @@
 #include "Take_Em_Down/Character/PlayerCharacter.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "UObject/ConstructorHelpers.h"
 ABaseNpcController::ABaseNpcController(FObjectInitializer const& object_intializer):m_AISightRadius(500.f), m_AISightAge(5.0f),
 m_AILooseSightRadius(m_AISightRadius + 50.f), m_AIFOV(145.f)
 {
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree>obj(TEXT(""));
 	PrimaryActorTick.bCanEverTick = true;
+	/*static ConstructorHelpers::FObjectFinder<UBehaviorTree>obj(TEXT("BehaviorTree'/Game/AI/BB_BT/Test_BT.Test_BT'"));
+	if (obj.Succeeded())
+	{
+		m_BT_Asset = obj.Object;
+	}*/
+	m_BTComp = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
+	m_BB_Comp = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 	m_SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>("NoSense");
 	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>("Per Comp"));
 	m_SightConfig->SightRadius = m_AISightRadius;
@@ -42,17 +49,15 @@ void ABaseNpcController::Tick(float DeltaTime)
 void ABaseNpcController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	TArray<AActor*> OutActor;
-	UGameplayStatics::GetAllActorsOfClass(this, m_GitClass, OutActor);
-	for (AActor* A : OutActor)
+	if (m_BT_Asset)
 	{
-		m_ACT = Cast<APlayerCharacter>(A);
-		if (m_ACT && m_ACT->IsLocallyControlled())
+		RunBehaviorTree(m_BT_Asset);
+		m_BTComp->StartTree(*m_BT_Asset);
+		if (m_BB_Comp)
 		{
-			return;
+			m_BB_Comp->InitializeBlackboard(*m_BT_Asset->BlackboardAsset);
 		}
 	}
-	RunBehaviorTree(m_BT_Asset);
 }
 
 FRotator ABaseNpcController::GetControlRotation() const
@@ -64,13 +69,28 @@ FRotator ABaseNpcController::GetControlRotation() const
 	return FRotator(0.f, GetPawn()->GetActorRotation().Yaw, 0.f);
 }
 
+APawn* ABaseNpcController::GetPlayerPawn() const
+{
+	return GetPawn();
+}
+
+FVector ABaseNpcController::GetPlayerLocation() const
+{
+	return GetPawn()->GetActorLocation();
+}
+
+UBlackboardComponent* ABaseNpcController::GetBlackboardComponent() const
+{
+	return m_BB_Comp;
+}
+
 void ABaseNpcController::OnPawnDetected(const TArray<AActor*>& UpdatedActors)
 {
 }
 
 void ABaseNpcController::OnTargetUpdate(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Stimulus.WasSuccessfullySensed() && Actor == m_ACT)
+	if (Stimulus.WasSuccessfullySensed())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Hello my name is "));
 	}
