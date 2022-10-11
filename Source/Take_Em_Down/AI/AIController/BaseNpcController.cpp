@@ -11,6 +11,7 @@
 ABaseNpcController::ABaseNpcController(FObjectInitializer const& object_intializer):m_AISightRadius(500.f), m_AISightAge(5.0f),
 m_AILooseSightRadius(m_AISightRadius + 50.f), m_AIFOV(145.f)
 {
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree>obj(TEXT(""));
 	PrimaryActorTick.bCanEverTick = true;
 	m_SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>("NoSense");
 	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>("Per Comp"));
