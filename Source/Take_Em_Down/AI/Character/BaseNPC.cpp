@@ -36,7 +36,7 @@ void ABaseNPC::SetAiming(bool InAiming)
 
 void ABaseNPC::PlayFireMontage(bool bInAiming)
 {
-	if (!CombatComponent || !CombatComponent->GetEquipedWeapon()) return;
+	if (!CombatComponent || !CombatComponent->GetEquipedWeapon() || HasAuthority()) return;
 	UAnimInstance* AnimIns = GetMesh()->GetAnimInstance();
 	if (AnimIns && FireWeaponMontage)
 	{

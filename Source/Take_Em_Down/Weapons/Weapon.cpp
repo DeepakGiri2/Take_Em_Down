@@ -70,7 +70,6 @@ void AWeapon::ShowPickUpWidget(bool InVisibility)
 
 void AWeapon::Fire(const FVector& HitLocation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shit"));
 	if (FireAnimation)
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);

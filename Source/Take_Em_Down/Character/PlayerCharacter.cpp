@@ -391,6 +391,7 @@ void APlayerCharacter::ITakeDamage(FHitResult InHit,FRotator InRotation)
 	if (P_BloodParticle)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_BloodParticle, InHit.Location, InRotation);
+		PlayHitReactMontage();
 	}
 	if (GetHealth() <= 0)
 	{

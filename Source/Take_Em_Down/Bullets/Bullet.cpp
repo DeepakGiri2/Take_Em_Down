@@ -9,7 +9,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Take_Em_Down/Character/PlayerCharacter.h"
 #include "Take_Em_Down/Interface/CrossHairInterface.h"
 
 
@@ -19,17 +18,17 @@ ABullet::ABullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-	BulletCollision = CreateDefaultSubobject<UBoxComponent>("Collision");
-	SetRootComponent(BulletCollision);
-	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	BulletMesh->SetupAttachment(BulletCollision);
-	BulletCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	BulletCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	BulletCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Block);
-	BulletCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
-	BullectProjectile = CreateDefaultSubobject<UProjectileMovementComponent>("BullectProjectile");
-	BullectProjectile->bRotationFollowsVelocity = true;
+	m_BulletCollision = CreateDefaultSubobject<UBoxComponent>("Collision");
+	SetRootComponent(m_BulletCollision);
+	m_BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	m_BulletMesh->SetupAttachment(m_BulletCollision);
+	m_BulletCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	m_BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	m_BulletCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	m_BulletCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Block);
+	m_BulletCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+	m_BullectProjectile = CreateDefaultSubobject<UProjectileMovementComponent>("BullectProjectile");
+	m_BullectProjectile->bRotationFollowsVelocity = true;
 }
 
 // Called when the game starts or when spawned
@@ -40,73 +39,75 @@ void ABullet::BeginPlay()
 	{
 		PC_TracerComponent = UGameplayStatics::SpawnEmitterAttached(
 			P_TracerParticles,
-			BulletCollision,
+			m_BulletCollision,
 			FName(),
 			GetActorLocation(),
 			GetActorRotation(),
 			EAttachLocation::KeepWorldPosition
 		);
 	}
-	//if (HasAuthority())
-	//{
-		BulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
-	//}
-	Debug.Add(this->GetActorLocation());
+	if (HasAuthority())
+	{
+		m_BulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
+	}
+
+	//BulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
 }
 
 void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	ACT = OtherActor;
-	HitResult = Hit;
+	m_HitResult = Hit;
+	m_OtherActor = OtherActor;
 	if (Hit.bBlockingHit)
 	{
-		ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(OtherActor);
-		if (OtherActor && HitActor)
+		Ser_SpawnEffects(m_OtherActor);
+	}
+}
+
+void ABullet::Ser_SpawnEffects_Implementation(AActor* ACT)
+{
+	Multi_SpawnEffects(ACT);
+}
+
+void ABullet::Multi_SpawnEffects_Implementation(AActor* ACT)
+{
+	if (!HasAuthority())
+	{
+		ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(ACT);
+		if (HitActor)
 		{
-			HitActor->ITakeDamage(Hit,FRotator(90,0,0));
+			FHitResult TemResultTest;
+			TemResultTest.Location = GetActorLocation();
+			HitActor->ITakeDamage(TemResultTest, GetActorRotation());
 		}
 		else
 		{
 			if (P_FireParticle)
 			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, HitResult.Location, FRotator(0.f, 0.f, 0.f));
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
 			}
-			DrawDebugSphere(GetWorld(), HitResult.Location, 5.f, 4, FColor::Blue, true);
-			if (ACT)
-			{
-				APlayerCharacter* LACT = Cast<APlayerCharacter>(ACT);
-				if (LACT)
-				{
-					LACT->PlayHitReactMontage();
-				}
-			}
-			Ser_SpawnEffects();
-			Destroy();
 		}
-		
 	}
-}
-
-void ABullet::Ser_SpawnEffects_Implementation()
-{
-	Multi_SpawnEffects();
-}
-
-void ABullet::Multi_SpawnEffects_Implementation()
-{
-	if (P_FireParticle)
+	if (m_HitResult.bBlockingHit)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, HitResult.Location, FRotator(0.f, 0.f, 0.f));
-	}
-	DrawDebugSphere(GetWorld(), HitResult.Location, 5.f, 4, FColor::Blue, true);
-	if (ACT)
-	{
-		APlayerCharacter* LACT = Cast<APlayerCharacter>(ACT);
-		if (LACT)
+		ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(m_OtherActor);
+		if (m_OtherActor && HitActor)
 		{
-			LACT->PlayHitReactMontage();
+			HitActor->ITakeDamage(m_HitResult, FRotator(90, 0, 0));
+			if (!HasAuthority())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Check for coll"));
+			}
+		}
+		else
+		{
+			if (P_FireParticle)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
+			}
 		}
 	}
+	Destroy();
 }
 
 // Called every frame
@@ -119,9 +120,5 @@ void ABullet::Tick(float DeltaTime)
 void ABullet::Destroyed()
 {
 	Super::Destroyed();
-	if (HitResult.bBlockingHit)
-	{
-		Ser_SpawnEffects();
-	}
 }
 

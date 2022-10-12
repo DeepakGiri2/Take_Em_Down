@@ -21,31 +21,29 @@ protected:
 	UFUNCTION()
 	virtual	void OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION(NetMulticast, Reliable)
-	void Multi_SpawnEffects();
+	void Multi_SpawnEffects(AActor* ACT);
 	UFUNCTION(Server, Reliable)
-	void Ser_SpawnEffects();
+	void Ser_SpawnEffects(AActor* ACT);
 private:
 	UPROPERTY(EditAnywhere, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr <class UBoxComponent> BulletCollision;
+		TObjectPtr <class UBoxComponent> m_BulletCollision;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr <UStaticMeshComponent> BulletMesh;
+		TObjectPtr <UStaticMeshComponent> m_BulletMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UParticleSystem> P_FireParticle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UParticleSystem> P_TracerParticles;
 	TObjectPtr<class UParticleSystemComponent> PC_TracerComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<class UProjectileMovementComponent> BullectProjectile;
+		TObjectPtr<class UProjectileMovementComponent> m_BullectProjectile;
 	UPROPERTY()
-	TArray < FVector > Debug;
+	FHitResult m_HitResult;
 	UPROPERTY()
-	TObjectPtr <AActor> ACT;
-	UPROPERTY()
-	FHitResult HitResult;
+	TObjectPtr <AActor> m_OtherActor;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroyed() override;
-	FORCEINLINE TObjectPtr <UStaticMeshComponent> GetBulletMesh() const { return BulletMesh; };
-	FORCEINLINE void SetBulletMesh(TObjectPtr<UStaticMesh> InMesh) { BulletMesh->SetStaticMesh(InMesh); }
+	FORCEINLINE TObjectPtr <UStaticMeshComponent> GetBulletMesh() const { return m_BulletMesh; };
+	FORCEINLINE void SetBulletMesh(TObjectPtr<UStaticMesh> InMesh) { m_BulletMesh->SetStaticMesh(InMesh); }
 };
