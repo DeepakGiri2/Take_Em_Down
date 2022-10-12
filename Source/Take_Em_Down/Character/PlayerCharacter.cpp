@@ -105,8 +105,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	//DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
-	DOREPLIFETIME(APlayerCharacter, OverlappingWeapon);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+	//DOREPLIFETIME(APlayerCharacter, OverlappingWeapon);
 }
 
 void APlayerCharacter::MoveForward(float value)

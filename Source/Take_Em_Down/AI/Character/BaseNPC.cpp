@@ -26,6 +26,14 @@ bool ABaseNPC::IsAiming()
 	return false;
 }
 
+void ABaseNPC::SetAiming(bool InAiming)
+{
+	if (CombatComponent)
+	{
+		CombatComponent->SetAiming(InAiming);
+	}
+}
+
 void ABaseNPC::PlayFireMontage(bool bInAiming)
 {
 	if (!CombatComponent || !CombatComponent->GetEquipedWeapon()) return;
@@ -80,4 +88,13 @@ void ABaseNPC::SpawnWeapon()
 	{
 		CombatComponent->EquipWeapon(TempWeapon);
 	}
+}
+
+TObjectPtr<AWeapon> ABaseNPC::GetEquipedWeapon() const
+{
+	if (CombatComponent)
+	{
+		return CombatComponent->GetEquipedWeapon();
+	}
+	return nullptr;
 }

@@ -5,19 +5,21 @@
 #include "CoreMinimal.h"
 #include "Take_Em_Down/Character/BaseCharacter.h"
 #include "Take_Em_Down/playerStates/TurnInPlace.h"
+#include "Take_Em_Down/AI/Interfaces/AIInterface.h"
 #include "BaseNPC.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TAKE_EM_DOWN_API ABaseNPC : public ABaseCharacter
+class TAKE_EM_DOWN_API ABaseNPC : public ABaseCharacter, public IAIInterface
 {
 	GENERATED_BODY()
 public:
 	ABaseNPC();
 	bool IsWeaponEquiped();
 	bool IsAiming();
+	void SetAiming(bool InAiming);
 	void PlayFireMontage(bool bInAiming);
 	virtual void ITakeDamage(FHitResult InHit, FRotator InRotation = FRotator(0.f, 0.f, 0.f)) override;
 	ETurningInPlace GetTurningInPlace();
@@ -38,5 +40,5 @@ private:
 private:
 	TObjectPtr<AWeapon> EquipedWeapon;
 public:
-	FORCEINLINE TObjectPtr<AWeapon> GetEquipedWeapon() const { return EquipedWeapon; }
+	FORCEINLINE TObjectPtr<AWeapon> GetEquipedWeapon() const;
 };

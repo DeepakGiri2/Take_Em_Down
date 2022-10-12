@@ -40,4 +40,5 @@ void UAnim_BaseAi::NativeUpdateAnimation(float DeltaTime)
 		LeftHandTransform.SetLocation(OutLoc);
 		LeftHandTransform.SetRotation(FQuat(OutRot));
 	}
+	
 }

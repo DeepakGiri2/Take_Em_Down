@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "Take_Em_Down/AI/Interfaces/AIInterface.h"
 #include "Perception/AIPerceptionTypes.h" 
 #include "BaseNpcController.generated.h"
 
@@ -13,7 +12,7 @@
  */
 
 UCLASS(Blueprintable)
-class TAKE_EM_DOWN_API ABaseNpcController : public AAIController , public IAIInterface
+class TAKE_EM_DOWN_API ABaseNpcController : public AAIController
 {
 	GENERATED_BODY()
 protected:
@@ -24,9 +23,6 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual FRotator GetControlRotation() const override;
-	virtual APawn* GetPlayerPawn() const override;
-	virtual FVector GetPlayerLocation() const override;
-	virtual class UBlackboardComponent* GetBlackboardComponent() const override;
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Comps, meta = (AllowPrivateAccess = "true"))
 	class UBehaviorTreeComponent* m_BTComp;
@@ -34,6 +30,8 @@ private:
 	class UBehaviorTree* m_BT_Asset;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Comps, meta = (AllowPrivateAccess = "true"))
 	UBlackboardComponent* m_BB_Comp;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class ABaseNPC> m_OwningNPC;
 public:
 	UFUNCTION()
 		void OnPawnDetected(const TArray<AActor*>& UpdatedActors);
@@ -49,8 +47,6 @@ public:
 		float m_AIFOV;
 	UPROPERTY(BlueprintReadWrite, Category = AI, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UAISenseConfig_Sight> m_SightConfig;
-	UPROPERTY(BlueprintReadWrite, Category = Variables, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<class APlayerCharacter> m_ACT;
 	UPROPERTY(BlueprintReadWrite, Category = Variables, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AActor> m_GitClass;
 

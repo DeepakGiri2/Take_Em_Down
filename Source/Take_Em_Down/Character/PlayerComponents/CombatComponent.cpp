@@ -123,9 +123,8 @@ void UCombatComponent::OnRep_EquipedWeapon()
 
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
-	
 	bFireButtonPressed = bPressed;
-	if (bFireButtonPressed)
+	if (bFireButtonPressed && EquipedWeapon)
 	{
 		Fire();
 	}
@@ -144,6 +143,39 @@ void UCombatComponent::Fire()
 		StartFireTimer();
 	}
 }
+
+void UCombatComponent::StartFireTimer()
+{
+	if (!EquipedWeapon || !ACT) return;
+	ACT->GetWorldTimerManager().SetTimer(FireTimer, this, &UCombatComponent::FireTimerCompleted, EquipedWeapon->FireDelay);
+
+}
+
+void UCombatComponent::FireTimerCompleted()
+{
+	bCanFire = true;
+	if (bFireButtonPressed && EquipedWeapon->bAutomatic)
+	{
+		Fire();
+	}
+}
+
+
+void UCombatComponent::Multi_Fire_Implementation(const FVector_NetQuantize& HitLocation)
+{
+	if (!EquipedWeapon) return;
+	if (ACT)
+	{
+		ACT->PlayFireMontage(bAiming);
+		EquipedWeapon->Fire(HitLocation);
+	}
+}
+
+void UCombatComponent::Ser_Fire_Implementation(const FVector_NetQuantize& HitLocation)
+{
+	Multi_Fire(HitLocation);
+}
+
 
 void UCombatComponent::TraceUnderCrossHairs(FHitResult& TraceHit)
 {
@@ -244,40 +276,12 @@ void UCombatComponent::SetHUDCrossHairs(float Deltatime)
 		}
 	}
 }
-
-
-void UCombatComponent::Multi_Fire_Implementation(const FVector_NetQuantize& HitLocation)
+void UCombatComponent::Ser_EquipWeapon_Implementation(AWeapon* WeaponToEquip)
 {
-	if (!EquipedWeapon) return;
-	if (ACT)
-	{
-		ACT->PlayFireMontage(bAiming);
-		EquipedWeapon->Fire(HitLocation);
-	}
+	Multi_EquipWeapon(WeaponToEquip);
 }
 
-void UCombatComponent::Ser_Fire_Implementation(const FVector_NetQuantize& HitLocation)
-{
-	Multi_Fire(HitLocation);
-}
-
-void UCombatComponent::StartFireTimer()
-{
-	if (!EquipedWeapon || !ACT) return;
-	ACT->GetWorldTimerManager().SetTimer(FireTimer, this, &UCombatComponent::FireTimerCompleted, EquipedWeapon->FireDelay);
-
-}
-
-void UCombatComponent::FireTimerCompleted()
-{
-	bCanFire = true;
-	if (bFireButtonPressed && EquipedWeapon->bAutomatic)
-	{
-		Fire();
-	}
-}
-
-void UCombatComponent::EquipWeapon(TObjectPtr<AWeapon> WeaponToEquip)
+void UCombatComponent::Multi_EquipWeapon_Implementation(AWeapon* WeaponToEquip)
 {
 	if (!ACT || !WeaponToEquip) return;
 	EquipedWeapon = WeaponToEquip;
@@ -290,6 +294,11 @@ void UCombatComponent::EquipWeapon(TObjectPtr<AWeapon> WeaponToEquip)
 	EquipedWeapon->SetOwner(ACT);
 	ACT->GetCharacterMovement()->bOrientRotationToMovement = false;
 	ACT->bUseControllerRotationYaw = true;
+}
+
+void UCombatComponent::EquipWeapon(TObjectPtr<AWeapon> WeaponToEquip)
+{
+	Ser_EquipWeapon(WeaponToEquip);
 }
 
 

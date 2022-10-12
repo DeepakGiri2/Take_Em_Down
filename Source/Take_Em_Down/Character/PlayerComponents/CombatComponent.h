@@ -34,7 +34,11 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 		void Multi_Fire(const FVector_NetQuantize& HitLocation);
 	UFUNCTION(Server, Reliable)
-		void Ser_Fire(const FVector_NetQuantize& HitLocation);
+		void Ser_Fire(const FVector_NetQuantize& HitLocation);//test
+	UFUNCTION(Server, Reliable)
+	void Ser_EquipWeapon(AWeapon* WeaponToEquip);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_EquipWeapon(AWeapon* WeaponToEquip);//test
 	void TraceUnderCrossHairs(FHitResult& TraceHit);
 	void SetHUDCrossHairs(float Deltatime);
 	void InterpFOV(float DeltaTime);
@@ -43,7 +47,7 @@ private:
 	TObjectPtr <APlayerCharacter> ACT;
 	TObjectPtr <class AACTPlayerController> ACTController;
 	TObjectPtr <class AACTHUD> ACTHUD;
-	UPROPERTY(ReplicatedUsing = OnRep_EquipedWeapon)
+	UPROPERTY(ReplicatedUsing = OnRep_EquipedWeapon, EditAnywhere, BlueprintReadWrite, Category = Details, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class AWeapon> EquipedWeapon;
 	bool bFireButtonPressed;
 	UPROPERTY(Replicated,VisibleAnywhere, BlueprintReadWrite, Category = combat, meta = (AllowPrivateAccess = "true"))

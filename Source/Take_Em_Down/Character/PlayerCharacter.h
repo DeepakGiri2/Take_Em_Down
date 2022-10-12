@@ -78,7 +78,7 @@ private:
 	UFUNCTION()
 	void OnRep_OnerlappingWeapon(AWeapon* LastWeapon);
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCombatComponent> CombatComponent;
 
 	UFUNCTION(Server,Reliable)

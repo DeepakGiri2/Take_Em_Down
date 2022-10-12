@@ -5,10 +5,11 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Kismet/GameplayStatics.h"
-#include "Take_Em_Down/Character/PlayerCharacter.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Take_Em_Down/AI/Defenitions/Blackboard_Keys.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Take_Em_Down/AI/Character/BaseNPC.h"
 ABaseNpcController::ABaseNpcController(FObjectInitializer const& object_intializer):m_AISightRadius(500.f), m_AISightAge(5.0f),
 m_AILooseSightRadius(m_AISightRadius + 50.f), m_AIFOV(145.f)
 {
@@ -49,6 +50,7 @@ void ABaseNpcController::Tick(float DeltaTime)
 void ABaseNpcController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	m_OwningNPC = Cast<ABaseNPC>(InPawn);
 	if (m_BT_Asset)
 	{
 		RunBehaviorTree(m_BT_Asset);
@@ -69,21 +71,6 @@ FRotator ABaseNpcController::GetControlRotation() const
 	return FRotator(0.f, GetPawn()->GetActorRotation().Yaw, 0.f);
 }
 
-APawn* ABaseNpcController::GetPlayerPawn() const
-{
-	return GetPawn();
-}
-
-FVector ABaseNpcController::GetPlayerLocation() const
-{
-	return GetPawn()->GetActorLocation();
-}
-
-UBlackboardComponent* ABaseNpcController::GetBlackboardComponent() const
-{
-	return m_BB_Comp;
-}
-
 void ABaseNpcController::OnPawnDetected(const TArray<AActor*>& UpdatedActors)
 {
 }
@@ -92,7 +79,13 @@ void ABaseNpcController::OnTargetUpdate(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (Stimulus.WasSuccessfullySensed())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hello my name is "));
+		m_BB_Comp->SetValueAsObject(BB_Keys::TargetActor, Actor);
+		m_OwningNPC->SetAiming(true);
+	}
+	else
+	{
+		m_BB_Comp->ClearValue(BB_Keys::TargetActor);
+		m_OwningNPC->SetAiming(false);
 	}
 }
 
