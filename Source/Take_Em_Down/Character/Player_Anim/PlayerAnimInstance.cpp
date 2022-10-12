@@ -30,6 +30,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	EquipedWeapon = ACT->GetEquipedWeapon();
 	bIsCrouched = ACT->bIsCrouched;
 	bAiming = ACT->IsAiming();
+	m_bShouldRotateRootBone = ACT->GetShouldRotateRootBone();
 	TurinngInPlace = ACT->GetTurningInPlace();
 	if (!ACT->GetIsServer())
 	{

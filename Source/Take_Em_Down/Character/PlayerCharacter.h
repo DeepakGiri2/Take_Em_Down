@@ -20,6 +20,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void OnRep_ReplicatedMovement() override;
 
 	// Movement
 	void MoveForward(float value);
@@ -40,7 +41,10 @@ protected:
 
 	//AnimationBp
 	void AimOffset(float DeltaTime);
+	void CalculateAO_Pitch();
 	void TurnInPlace(float DeltaTime);
+	void SimulatedProxyTurn();
+	float CalculateSpeed();
 	//Animation BP
 
 	//CameraHide
@@ -106,7 +110,14 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UParticleSystem> P_BloodParticle;
-
+	//Simulated Proxy Rotation
+	bool m_bRotateRootBone;
+	float m_TurnThreshold = 0.5f;
+	FRotator m_ProxyRotationLastFrame;
+	FRotator m_ProxyRotation;
+	float m_ProxyYaw;
+	float m_TimeSinceLastMovementReplication;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -148,6 +159,7 @@ public:
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return Camera; }
 
 	FORCEINLINE bool GetIsServer() const { return !IsLocallyControlled(); }
+	FORCEINLINE bool GetShouldRotateRootBone() const{ return m_bRotateRootBone; }
 
 	TObjectPtr <AWeapon> GetEquipedWeapon();
 

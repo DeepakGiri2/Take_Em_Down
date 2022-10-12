@@ -55,6 +55,8 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+
+
 void APlayerCharacter::HideCharacterWhileOverlapping()
 {
 	if (!IsLocallyControlled()) return;
@@ -98,8 +100,27 @@ void APlayerCharacter::HideCharacterWhileOverlapping()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AimOffset(DeltaTime);
+	if (GetLocalRole() > ENetRole::ROLE_SimulatedProxy && IsLocallyControlled())
+	{
+		AimOffset(DeltaTime);
+	}
+	else
+	{
+		m_TimeSinceLastMovementReplication += DeltaTime;
+		if (m_TimeSinceLastMovementReplication > 0.25f)
+		{
+			OnRep_ReplicatedMovement();
+		}
+		CalculateAO_Pitch();
+	}
 	HideCharacterWhileOverlapping();
+}
+
+void APlayerCharacter::OnRep_ReplicatedMovement()
+{
+	Super::OnRep_ReplicatedMovement();
+	SimulatedProxyTurn();
+	m_TimeSinceLastMovementReplication = 0.f;
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -245,12 +266,11 @@ void APlayerCharacter::CrouchButtonPressed()
 void APlayerCharacter::AimOffset(float DeltaTime)
 {
 	if (CombatComponent && !CombatComponent->EquipedWeapon) return;
-	FVector Velocity = GetVelocity();
-	Velocity.Z = 0.f;
-	float Speed = Velocity.Size();
+	float Speed = CalculateSpeed();
 	bool bInAir = GetCharacterMovement()->IsFalling();
 	if (Speed == 0.f && !bInAir) // Standing Not Jumping
 	{
+		m_bRotateRootBone = true;
 		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		FRotator DeltaRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaRotation.Yaw;
@@ -263,18 +283,24 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 	}
 	if (Speed > 0.f || bInAir) // Running And Jumping
 	{
+		m_bRotateRootBone = false;
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		AO_Yaw = 0.f;
 		bUseControllerRotationYaw = true;
 		TurinngInPlace = ETurningInPlace::ETIP_NotTuring;
 	}
+	CalculateAO_Pitch();
+}
+
+void APlayerCharacter::CalculateAO_Pitch()
+{
 	AO_Pitch = GetBaseAimRotation().Pitch;
 	if (AO_Pitch > 90.f && !IsLocallyControlled())
 	{
 		// map the Range [270,360] to [-90,0]
 		FVector2D InRange(270.f, 360.f);
 		FVector2D OutRange(-90.f, 0.f);
-		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange,AO_Pitch);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
 }
 
@@ -298,6 +324,46 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 			StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		}
 	}
+}
+
+void APlayerCharacter::SimulatedProxyTurn()
+{
+	if (!CombatComponent ||!CombatComponent->EquipedWeapon) return;
+	m_bRotateRootBone = false;
+	float Speed = CalculateSpeed();
+	if (Speed > 0.f)
+	{
+		TurinngInPlace = ETurningInPlace::ETIP_NotTuring;
+		return;
+	}
+
+	m_ProxyRotationLastFrame = m_ProxyRotation;
+	m_ProxyRotation = GetActorRotation();
+	m_ProxyYaw = UKismetMathLibrary::NormalizedDeltaRotator(m_ProxyRotation, m_ProxyRotationLastFrame).Yaw;
+	if (FMath::Abs(m_ProxyYaw) > m_TurnThreshold)
+	{
+		if (m_ProxyYaw > m_TurnThreshold)
+		{
+			TurinngInPlace = ETurningInPlace::ETIP_Right;
+		}
+		else if (m_ProxyYaw < -m_TurnThreshold)
+		{
+			TurinngInPlace = ETurningInPlace::ETIP_Left;
+		}
+		else
+		{
+			TurinngInPlace = ETurningInPlace::ETIP_NotTuring;
+		}
+		return;
+	}
+	TurinngInPlace = ETurningInPlace::ETIP_NotTuring;
+}
+
+float APlayerCharacter::CalculateSpeed()
+{
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	return Velocity.Size();
 }
 
 
@@ -393,8 +459,9 @@ void APlayerCharacter::ITakeDamage(FHitResult InHit,FRotator InRotation)
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_BloodParticle, InHit.Location, InRotation);
 		PlayHitReactMontage();
 	}
-	if (GetHealth() <= 0)
+	if (GetHealth() == 0)
 	{
+		GetMesh()->SetSimulatePhysics(true);
 	}
 }
 
@@ -410,9 +477,6 @@ FVector APlayerCharacter::GetHitTarget() const
 	if (!CombatComponent) return FVector();
 	return CombatComponent->HitTarget;
 }
-
-
-
 
 void APlayerCharacter::Ser_SelectButtonPressed_Implementation()//ServerEquipButtonPressed
 {
