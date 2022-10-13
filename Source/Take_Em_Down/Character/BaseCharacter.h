@@ -42,7 +42,7 @@ private:
 	/** MotionWarping Component **/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(ReplicatedUsing = OnRep_Health,EditAnywhere, BlueprintReadWrite, Category = PlayerStats, meta = (AllowPrivateAccess = "true"))
 		float Health = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerStats, meta = (AllowPrivateAccess = "true"))
 		float MaxHealth = 100.f;
@@ -52,10 +52,15 @@ protected:
 
 	void SetUpMetaSync();
 
+	UFUNCTION()
+	void OnRep_Health();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	virtual float IGetHealth() const override;
+	virtual float IGetHealthPercentage() const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	/** Groom **/
@@ -74,6 +79,7 @@ public:
 	/*Char Stats*/
 	FORCEINLINE float GetHealth() const { return Health; }
 	void SetHealth(float InHelath);
+	FORCEINLINE float GetHealthPercentage() const;
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	FORCEINLINE void SetMaxHealth(float InHelath) { MaxHealth = InHelath; }
 };

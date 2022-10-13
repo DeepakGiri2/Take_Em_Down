@@ -2,6 +2,6 @@
 	"BuildId": "19505902",
 	"Modules": 
 	{
-		"MultiplayerModule": "UnrealEditor-MultiplayerModule-0049.dll"
+		"MultiplayerModule": "UnrealEditor-MultiplayerModule.dll"
 	}
 }

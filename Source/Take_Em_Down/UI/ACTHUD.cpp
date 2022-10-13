@@ -2,7 +2,8 @@
 
 
 #include "ACTHUD.h"
-
+#include "GameFramework/PlayerController.h"
+#include "Take_Em_Down/UI/Online/PlayerOverlay.h"
 void AACTHUD::DrawHUD()
 {
 	Super::DrawHUD();
@@ -38,6 +39,24 @@ void AACTHUD::DrawHUD()
 			FVector2D Spread(0.f, SpreadScaled);
 			DrawCrosshair(HUDCollection.CrossHairBottom, ViewportCenter,Spread, HUDCollection.CrossHairsColor);
 		}
+	}
+}
+
+void AACTHUD::BeginPlay()
+{
+	Super::BeginPlay();
+	AddPlayerOverlay();
+	UE_LOG(LogTemp, Warning, TEXT("Start"));
+}
+
+void AACTHUD::AddPlayerOverlay()
+{
+	APlayerController* TempController = GetOwningPlayerController();
+	if(TempController && PlayerOverlayClass)
+	{
+		m_PlayerOverlay = CreateWidget<UPlayerOverlay>(TempController,PlayerOverlayClass);
+		m_PlayerOverlay->AddToViewport();
+		UE_LOG(LogTemp, Warning, TEXT("Hello ACT"));
 	}
 }
 

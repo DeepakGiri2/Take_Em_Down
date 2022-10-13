@@ -12,13 +12,13 @@ struct FHUDCollection
 {
 	GENERATED_USTRUCT_BODY()
 public:
-		TObjectPtr<class UTexture2D> CrossHairCenter;
-		TObjectPtr<UTexture2D> CrossHairLeft;
-		TObjectPtr<UTexture2D> CrossHairRight;
-		TObjectPtr<UTexture2D> CrossHairTop;
-		TObjectPtr<UTexture2D> CrossHairBottom;
-		float CrosshairSpread;
-		FLinearColor CrossHairsColor;
+	TObjectPtr<class UTexture2D> CrossHairCenter;
+	TObjectPtr<UTexture2D> CrossHairLeft;
+	TObjectPtr<UTexture2D> CrossHairRight;
+	TObjectPtr<UTexture2D> CrossHairTop;
+	TObjectPtr<UTexture2D> CrossHairBottom;
+	float CrosshairSpread;
+	FLinearColor CrossHairsColor;
 };
 
 /**
@@ -30,7 +30,15 @@ class TAKE_EM_DOWN_API AACTHUD : public AHUD
 	GENERATED_BODY()
 public:
 	virtual void DrawHUD() override;
+	UPROPERTY(EditAnyWhere)
+	TSubclassOf<class UUserWidget> PlayerOverlayClass;
+	TObjectPtr<class UPlayerOverlay> m_PlayerOverlay;
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	void AddPlayerOverlay();
 private:
+
 	FHUDCollection HUDCollection;
 	void DrawCrosshair(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor InCrossHairsColor);
 	UPROPERTY(EditAnywhere)

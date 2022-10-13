@@ -112,6 +112,7 @@ private:
 		TObjectPtr<class UParticleSystem> P_BloodParticle;
 	//Simulated Proxy Rotation
 	bool m_bRotateRootBone;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ATurn, meta = (AllowPrivateAccess = "true"))
 	float m_TurnThreshold = 0.5f;
 	FRotator m_ProxyRotationLastFrame;
 	FRotator m_ProxyRotation;

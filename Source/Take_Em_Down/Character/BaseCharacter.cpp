@@ -4,6 +4,7 @@
 #include "BaseCharacter.h"
 #include "MotionWarpingComponent.h"
 #include "GroomComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "Components/LODSyncComponent.h"
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -129,11 +130,31 @@ void ABaseCharacter::SetUpMetaSync()
 	MetaLod->CustomLODMapping.Add(FName("Legs"), LegsData);
 }
 
+void ABaseCharacter::OnRep_Health()
+{
+}
+
 // Called every frame
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+float ABaseCharacter::IGetHealth() const
+{
+	return GetHealth();
+}
+
+float ABaseCharacter::IGetHealthPercentage() const
+{
+	return GetHealthPercentage();
+}
+
+void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABaseCharacter, Health);
 }
 
 // Called to bind functionality to input
@@ -146,5 +167,10 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ABaseCharacter::SetHealth(float InHelath)
 {
 	Health = FMath::Clamp(InHelath, 0, MaxHealth);
+}
+
+float ABaseCharacter::GetHealthPercentage() const
+{
+	return (Health/MaxHealth) * 100;
 }
 
