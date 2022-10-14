@@ -46,17 +46,15 @@ void AACTHUD::BeginPlay()
 {
 	Super::BeginPlay();
 	AddPlayerOverlay();
-	UE_LOG(LogTemp, Warning, TEXT("Start"));
 }
 
 void AACTHUD::AddPlayerOverlay()
 {
 	APlayerController* TempController = GetOwningPlayerController();
-	if(TempController && PlayerOverlayClass)
+	if(TempController, m_PlayerOverlayClass)
 	{
-		m_PlayerOverlay = CreateWidget<UPlayerOverlay>(TempController,PlayerOverlayClass);
+		m_PlayerOverlay = CreateWidget<UPlayerOverlay>(TempController, m_PlayerOverlayClass);
 		m_PlayerOverlay->AddToViewport();
-		UE_LOG(LogTemp, Warning, TEXT("Hello ACT"));
 	}
 }
 

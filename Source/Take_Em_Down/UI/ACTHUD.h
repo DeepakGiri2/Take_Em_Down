@@ -30,8 +30,8 @@ class TAKE_EM_DOWN_API AACTHUD : public AHUD
 	GENERATED_BODY()
 public:
 	virtual void DrawHUD() override;
-	UPROPERTY(EditAnyWhere)
-	TSubclassOf<class UUserWidget> PlayerOverlayClass;
+	UPROPERTY(EditAnywhere, Category = "Player Stats")
+	TSubclassOf<class UPlayerOverlay> m_PlayerOverlayClass;
 	TObjectPtr<class UPlayerOverlay> m_PlayerOverlay;
 protected:
 	// Called when the game starts or when spawned

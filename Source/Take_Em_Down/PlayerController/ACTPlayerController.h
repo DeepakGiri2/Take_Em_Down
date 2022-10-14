@@ -13,5 +13,10 @@ UCLASS()
 class TAKE_EM_DOWN_API AACTPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+public:
+	void SetHUDHealth(float Health,float MaxHealth, float Percentage);
+protected:
+	virtual void BeginPlay() override;
+private:
+	TObjectPtr<class AACTHUD> ACTHUD;
 };

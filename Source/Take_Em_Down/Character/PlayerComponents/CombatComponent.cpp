@@ -213,6 +213,8 @@ void UCombatComponent::TraceUnderCrossHairs(FHitResult& TraceHit)
 		{
 			HUDPackage.CrossHairsColor = FLinearColor::White;
 		}
+		DrawDebugSphere(GetWorld(), TraceHit.ImpactPoint, 5, 2, FColor::Red, false, 0.5);
+		DrawDebugLine(GetWorld(), Start, TraceHit.ImpactPoint, FColor::Blue, false, 0.2);
 	}
 }
 

@@ -11,6 +11,7 @@
 #include "Take_Em_Down/Weapons/Weapon.h"
 #include "Take_Em_Down/Character/PlayerComponents/CombatComponent.h"
 #include "Take_Em_Down/Character/Player_Anim/PlayerAnimInstance.h"
+#include "Take_Em_Down/PlayerController/ACTPlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "GroomComponent.h"
 // Sets default values
@@ -53,6 +54,18 @@ MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f),TurinngInPlace(ETurningInPlace:
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	SetPlayerControllerAndHUD();
+}
+
+void APlayerCharacter::SetPlayerControllerAndHUD()
+{
+	if (IsLocallyControlled() && GetLocalRole() > ENetRole::ROLE_SimulatedProxy)
+	{
+		SetHealth(100);
+		SetMaxHealth(100);
+		PlayerController = Cast<AACTPlayerController>(Controller);
+		PlayerController->SetHUDHealth(GetHealth(), GetMaxHealth(), GetHealthPercentage());
+	}
 }
 
 
@@ -452,16 +465,21 @@ bool APlayerCharacter::IsAiming()
 
 void APlayerCharacter::ITakeDamage(FHitResult InHit,FRotator InRotation)
 {
-	float Chicka = GetHealth() - 10;
+	float Chicka = GetHealth() - 1;
 	SetHealth(Chicka);
 	if (P_BloodParticle)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_BloodParticle, InHit.Location, InRotation);
 		PlayHitReactMontage();
+		
 	}
 	if (GetHealth() == 0)
 	{
 		GetMesh()->SetSimulatePhysics(true);
+	}
+	if (PlayerController)
+	{
+		PlayerController->SetHUDHealth(GetHealth(), GetMaxHealth(), GetHealthPercentage());
 	}
 }
 

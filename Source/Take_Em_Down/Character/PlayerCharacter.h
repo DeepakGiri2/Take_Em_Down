@@ -20,6 +20,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void SetPlayerControllerAndHUD();
 	virtual void OnRep_ReplicatedMovement() override;
 
 	// Movement
@@ -118,6 +119,9 @@ private:
 	FRotator m_ProxyRotation;
 	float m_ProxyYaw;
 	float m_TimeSinceLastMovementReplication;
+	UPROPERTY()
+	TObjectPtr<class AACTPlayerController> PlayerController;//this char playercotroller
+
 	
 public:
 	// Called every frame
