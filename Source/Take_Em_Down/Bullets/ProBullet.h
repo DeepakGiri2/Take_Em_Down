@@ -13,5 +13,6 @@ UCLASS()
 class TAKE_EM_DOWN_API AProBullet : public ABullet
 {
 	GENERATED_BODY()
-	
+protected:
+	virtual	void OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 };

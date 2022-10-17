@@ -7,7 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include "Runtime/NavigationSystem/Public/NavigationSystem.h"
-#include "Take_Em_Down/AI/AIController/BaseNpcController.h"
+#include "AIController.h"
 
 UFind_Random_Location::UFind_Random_Location()
 {

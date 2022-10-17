@@ -56,6 +56,10 @@ ABaseCharacter::ABaseCharacter()
 	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 }
 
+void ABaseCharacter::Eliminated()
+{
+}
+
 // Called when the game starts or when spawned
 void ABaseCharacter::BeginPlay()
 {
@@ -130,10 +134,6 @@ void ABaseCharacter::SetUpMetaSync()
 	MetaLod->CustomLODMapping.Add(FName("Legs"), LegsData);
 }
 
-void ABaseCharacter::OnRep_Health()
-{
-}
-
 // Called every frame
 void ABaseCharacter::Tick(float DeltaTime)
 {
@@ -161,7 +161,6 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void ABaseCharacter::SetHealth(float InHelath)

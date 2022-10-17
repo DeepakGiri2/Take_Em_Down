@@ -62,7 +62,7 @@
 /DBUILD_VERSION=++UE5+Release-5.0-CL-20979098
 /DBUILD_ICON_FILE_NAME="\"..\\Build\\Windows\\Resources\\Default.ico\""
 /DPROJECT_COMPANY_NAME=Deepak
-/DPROJECT_COPYRIGHT_STRING="Apache 2.0"
+/DPROJECT_COPYRIGHT_STRING="Owned By Deepak"
 /DPROJECT_PRODUCT_NAME="Code Sim"
 /DPROJECT_PRODUCT_IDENTIFIER=Take_Em_Down
 /fo "C:\Users\Deepak\Documents\Unreal Projects\Take_Em_Down\Take_Em_Down\Plugins\MultiplayerModule\Intermediate\Build\Win64\UnrealEditor\Development\MultiplayerModule\Default.rc2.res"

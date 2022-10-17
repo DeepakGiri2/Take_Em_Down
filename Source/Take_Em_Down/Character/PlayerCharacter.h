@@ -20,7 +20,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void SetPlayerControllerAndHUD();
 	virtual void OnRep_ReplicatedMovement() override;
 
 	// Movement
@@ -52,6 +51,13 @@ protected:
 	void HideCharacterWhileOverlapping();
 	//CameraHide
 
+	//Health And Damage
+	UFUNCTION()
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController, AActor* DamageCauser);
+	void UpdateHUDHealth();
+	void InitializeHealth();
+	virtual void OnRep_Health() override;
+	//Health And Damage
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

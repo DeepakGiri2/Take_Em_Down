@@ -53,7 +53,7 @@ protected:
 	void SetUpMetaSync();
 
 	UFUNCTION()
-	void OnRep_Health();
+	virtual void OnRep_Health() { UE_LOG(LogTemp, Warning, TEXT("Chuck")); };
 
 public:
 	// Called every frame

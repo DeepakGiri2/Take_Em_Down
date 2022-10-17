@@ -50,8 +50,6 @@ void ABullet::BeginPlay()
 	{
 		m_BulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
 	}
-
-	//BulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnTheHit);
 }
 
 void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -73,7 +71,7 @@ void ABullet::Multi_SpawnEffects_Implementation(AActor* ACT)
 {
 	if (!HasAuthority())
 	{
-		ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(ACT);
+		/*ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(ACT);
 		if (HitActor)
 		{
 			FHitResult TemResultTest;
@@ -86,11 +84,15 @@ void ABullet::Multi_SpawnEffects_Implementation(AActor* ACT)
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
 			}
+		}*/
+		if (P_FireParticle)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
 		}
 	}
 	if (m_HitResult.bBlockingHit)
 	{
-		ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(m_OtherActor);
+		/*ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(m_OtherActor);
 		if (m_OtherActor && HitActor)
 		{
 			HitActor->ITakeDamage(m_HitResult, FRotator(90, 0, 0));
@@ -105,6 +107,10 @@ void ABullet::Multi_SpawnEffects_Implementation(AActor* ACT)
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
 			}
+		}*/
+		if (P_FireParticle)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
 		}
 	}
 	Destroy();
@@ -115,10 +121,5 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void ABullet::Destroyed()
-{
-	Super::Destroyed();
 }
 

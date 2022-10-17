@@ -54,21 +54,13 @@ MouseHipLookUpRate(1.0f), MouseAimTurnRate(0.2f),TurinngInPlace(ETurningInPlace:
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	SetPlayerControllerAndHUD();
-}
-
-void APlayerCharacter::SetPlayerControllerAndHUD()
-{
-	if (IsLocallyControlled() && GetLocalRole() > ENetRole::ROLE_SimulatedProxy)
+	InitializeHealth();
+	UpdateHUDHealth();
+	if (HasAuthority())
 	{
-		SetHealth(100);
-		SetMaxHealth(100);
-		PlayerController = Cast<AACTPlayerController>(Controller);
-		PlayerController->SetHUDHealth(GetHealth(), GetMaxHealth(), GetHealthPercentage());
+		OnTakeAnyDamage.AddDynamic(this, &APlayerCharacter::ReceiveDamage);
 	}
 }
-
-
 
 void APlayerCharacter::HideCharacterWhileOverlapping()
 {
@@ -107,6 +99,38 @@ void APlayerCharacter::HideCharacterWhileOverlapping()
 			CombatComponent->EquipedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
 		}
 	}
+}
+
+void APlayerCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser)
+{
+	float CurrentHealth= GetHealth() - Damage;
+	SetHealth(CurrentHealth);
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+}
+
+void APlayerCharacter::UpdateHUDHealth()
+{
+	PlayerController = PlayerController == nullptr ? Cast<AACTPlayerController>(Controller) : PlayerController;
+	if (PlayerController)
+	{
+		PlayerController->SetHUDHealth(GetHealth(), GetMaxHealth(), GetHealthPercentage());
+	}
+}
+
+void APlayerCharacter::InitializeHealth()
+{
+	float Hel = FMath::FRandRange(74, 95);
+	SetHealth(Hel);
+	SetMaxHealth(100);
+}
+
+void APlayerCharacter::OnRep_Health()
+{
+	Super::OnRep_Health();
+	UE_LOG(LogTemp, Warning, TEXT("FUCK"));
+	UpdateHUDHealth();
+	PlayHitReactMontage();
 }
 
 // Called every frame
@@ -436,7 +460,6 @@ void APlayerCharacter::SetOverlappingWeapon(TObjectPtr<AWeapon> InWeapon)
 			OverlappingWeapon->ShowPickUpWidget(true);
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Blue, FString("Condition"));
 }
 
 void APlayerCharacter::PlayHitReactMontage()

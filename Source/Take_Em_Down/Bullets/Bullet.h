@@ -40,10 +40,13 @@ private:
 	FHitResult m_HitResult;
 	UPROPERTY()
 	TObjectPtr <AActor> m_OtherActor;
+	UPROPERTY()
+	float Damage = 3.1415;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void Destroyed() override;
 	FORCEINLINE TObjectPtr <UStaticMeshComponent> GetBulletMesh() const { return m_BulletMesh; };
 	FORCEINLINE void SetBulletMesh(TObjectPtr<UStaticMesh> InMesh) { m_BulletMesh->SetStaticMesh(InMesh); }
+	FORCEINLINE float GetDamage() const { return Damage; }
 };
