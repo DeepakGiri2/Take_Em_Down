@@ -57,6 +57,7 @@ protected:
 	void UpdateHUDHealth();
 	void InitializeHealth();
 	virtual void OnRep_Health() override;
+	virtual TObjectPtr<AController> GetController() const override;
 	//Health And Damage
 	
 private:
@@ -115,8 +116,8 @@ private:
 	UPROPERTY(EditAnywhere)
 		float CameraThreshold;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<class UParticleSystem> P_BloodParticle;
+	
+
 	//Simulated Proxy Rotation
 	bool m_bRotateRootBone;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ATurn, meta = (AllowPrivateAccess = "true"))

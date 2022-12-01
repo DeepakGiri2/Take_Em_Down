@@ -25,4 +25,5 @@ public:
 	virtual void ITakeDamage(FHitResult InResult,FRotator InRotation = FRotator(0.f,0.f,0.f));
 	virtual float IGetHealth() const = 0;
 	virtual float IGetHealthPercentage() const = 0;
+	virtual TObjectPtr<class AController> GetController() const { return nullptr; }
 };

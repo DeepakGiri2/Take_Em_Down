@@ -128,9 +128,14 @@ void APlayerCharacter::InitializeHealth()
 void APlayerCharacter::OnRep_Health()
 {
 	Super::OnRep_Health();
-	UE_LOG(LogTemp, Warning, TEXT("FUCK"));
 	UpdateHUDHealth();
 	PlayHitReactMontage();
+	
+}
+
+TObjectPtr<AController> APlayerCharacter::GetController() const
+{
+	return Controller;
 }
 
 // Called every frame
@@ -490,12 +495,7 @@ void APlayerCharacter::ITakeDamage(FHitResult InHit,FRotator InRotation)
 {
 	float Chicka = GetHealth() - 1;
 	SetHealth(Chicka);
-	if (P_BloodParticle)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_BloodParticle, InHit.Location, InRotation);
 		PlayHitReactMontage();
-		
-	}
 	if (GetHealth() == 0)
 	{
 		GetMesh()->SetSimulatePhysics(true);

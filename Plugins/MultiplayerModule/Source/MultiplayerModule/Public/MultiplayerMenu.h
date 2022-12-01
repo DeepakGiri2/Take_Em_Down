@@ -19,7 +19,8 @@ public:
 		UMultiplayerMenu* MenuSetup(int32 NumberPublicConnection = 4, FString TypeofMatch = FString(TEXT("FreeForAll")),FString LobbyPath = FString(TEXT("/Game/ThirdPerson/Maps/Lobby")));
 protected:
 	virtual bool Initialize() override;
-	virtual void OnLevelRemovedFromWorld(ULevel* InLevel,UWorld* InWorld)override;
+	//virtual void OnLevelRemovedFromWorld(ULevel* InLevel,UWorld* InWorld)override;
+	virtual void NativeDestruct() override;
 	/*
 	* Call back for our Custom delegate on MultiplayerModuleSubSystem
 	*/

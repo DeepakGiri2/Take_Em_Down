@@ -22,8 +22,6 @@ protected:
 	virtual	void OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multi_SpawnEffects(AActor* ACT);
-	UFUNCTION(Server, Reliable)
-	void Ser_SpawnEffects(AActor* ACT);
 private:
 	UPROPERTY(EditAnywhere, Category = BulletProperties, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr <class UBoxComponent> m_BulletCollision;

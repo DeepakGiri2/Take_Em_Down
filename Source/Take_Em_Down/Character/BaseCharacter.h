@@ -15,6 +15,7 @@ class TAKE_EM_DOWN_API ABaseCharacter : public ACharacter, public ICrossHairInte
 public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
+	void Eliminated();
 private:
 	/*Groom*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Groom, meta = (AllowPrivateAccess = "true"))

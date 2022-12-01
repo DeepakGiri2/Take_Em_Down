@@ -67,10 +67,15 @@ bool UMultiplayerMenu::Initialize()
 	return true;
 }
 
-void UMultiplayerMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+void UMultiplayerMenu::NativeDestruct()
 {
 	MenuTearDown();
 }
+
+/*void UMultiplayerMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+{
+	MenuTearDown();
+}*/
 
 void UMultiplayerMenu::OnCreateSession(bool bWasSucessfull)
 {

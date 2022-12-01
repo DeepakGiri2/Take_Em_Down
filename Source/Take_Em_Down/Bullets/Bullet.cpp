@@ -58,33 +58,14 @@ void ABullet::OnTheHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 	m_OtherActor = OtherActor;
 	if (Hit.bBlockingHit)
 	{
-		Ser_SpawnEffects(m_OtherActor);
+		Multi_SpawnEffects(OtherActor);
 	}
-}
-
-void ABullet::Ser_SpawnEffects_Implementation(AActor* ACT)
-{
-	Multi_SpawnEffects(ACT);
 }
 
 void ABullet::Multi_SpawnEffects_Implementation(AActor* ACT)
 {
 	if (!HasAuthority())
 	{
-		/*ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(ACT);
-		if (HitActor)
-		{
-			FHitResult TemResultTest;
-			TemResultTest.Location = GetActorLocation();
-			HitActor->ITakeDamage(TemResultTest, GetActorRotation());
-		}
-		else
-		{
-			if (P_FireParticle)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
-			}
-		}*/
 		if (P_FireParticle)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
@@ -92,22 +73,6 @@ void ABullet::Multi_SpawnEffects_Implementation(AActor* ACT)
 	}
 	if (m_HitResult.bBlockingHit)
 	{
-		/*ICrossHairInterface* HitActor = Cast<ICrossHairInterface>(m_OtherActor);
-		if (m_OtherActor && HitActor)
-		{
-			HitActor->ITakeDamage(m_HitResult, FRotator(90, 0, 0));
-			if (!HasAuthority())
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Check for coll"));
-			}
-		}
-		else
-		{
-			if (P_FireParticle)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
-			}
-		}*/
 		if (P_FireParticle)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), P_FireParticle, GetActorTransform());
